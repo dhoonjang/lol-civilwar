@@ -1,7 +1,7 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "@/lib/prisma";
-import { compare } from "bcrypt";
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import prisma from '@/lib/prisma';
+import { compare } from 'bcrypt';
 
 export default NextAuth({
   providers: [
@@ -14,7 +14,7 @@ export default NextAuth({
           password: string;
         };
         if (!email || !password) {
-          throw new Error("Missing username or password");
+          throw new Error('Missing username or password');
         }
         const user = await prisma.user.findUnique({
           where: {
@@ -23,11 +23,11 @@ export default NextAuth({
         });
         // if user doesn't exist or password doesn't match
         if (!user || !(await compare(password, user.password))) {
-          throw new Error("Invalid username or password");
+          throw new Error('Invalid username or password');
         }
         return user;
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
 });
