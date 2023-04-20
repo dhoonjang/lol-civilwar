@@ -1,33 +1,20 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth, { AuthOptions } from 'next-auth';
+import DiscordProvider from 'next-auth/providers/discord';
 import prisma from '@/lib/prisma';
-import { compare } from 'bcrypt';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
-export default NextAuth({
+export const authOptions: AuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  adapter: PrismaAdapter(prisma),
   providers: [
-    CredentialsProvider({
-      credentials: {},
-      // @ts-ignore
-      async authorize(credentials, _) {
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
-        if (!email || !password) {
-          throw new Error('Missing username or password');
-        }
-        const user = await prisma.user.findUnique({
-          where: {
-            email,
-          },
-        });
-        // if user doesn't exist or password doesn't match
-        if (!user || !(await compare(password, user.password))) {
-          throw new Error('Invalid username or password');
-        }
-        return user;
-      },
+    DiscordProvider({
+      clientId: '1098189483125506139',
+      clientSecret: process.env.DISCORD_CLIENT_SECRET || '',
     }),
   ],
-  session: { strategy: 'jwt' },
-});
+  session: {
+    strategy: 'jwt',
+  },
+};
+
+export default NextAuth(authOptions);

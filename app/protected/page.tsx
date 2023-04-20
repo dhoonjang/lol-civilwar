@@ -1,18 +1,19 @@
 import SignOut from '@/components/sign-out';
+import { getServerSession } from 'next-auth';
+import { authOptions } from 'pages/api/auth/[...nextauth]';
 
-export default function Home() {
+const Home = async () => {
+  const session = await getServerSession(authOptions);
+
+  console.log('home', session);
+
   return (
     <div className="flex h-screen bg-black">
       <div className="w-screen h-screen flex flex-col space-y-5 justify-center items-center">
-        <iframe
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-          title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full max-w-screen-lg aspect-video"
-        ></iframe>
         <SignOut />
       </div>
     </div>
   );
-}
+};
+
+export default Home;
