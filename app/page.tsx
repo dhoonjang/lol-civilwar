@@ -1,10 +1,10 @@
+import SignOut from '@/components/signOut';
+import UpdatePoint from '@/components/updatePoint';
 import { getUserInfo } from 'api/users';
 import Image from 'next/image';
 
 const Home = async () => {
   const user = await getUserInfo();
-
-  console.log(user);
 
   return (
     <div className="flex h-screen bg-black">
@@ -21,6 +21,8 @@ const Home = async () => {
             제 2회 찌질이들의 롤대회
           </h1>
           <p className="text-stone-200 mt-5">{user?.name}</p>
+          <UpdatePoint />
+          <SignOut />
         </div>
       </div>
     </div>

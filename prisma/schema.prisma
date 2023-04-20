@@ -45,7 +45,7 @@ model User {
   battlePoint     Int @default(0)
   tier            Int @default(0)
 
-  lastUpdateTime  DateTime?
+  lastUpdateTime  DateTime? @updatedAt
 
   participants    Participant[]
 }
