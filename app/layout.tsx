@@ -15,6 +15,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head></head>
       <body className={inter.variable}>
         <Toaster />
         {children}

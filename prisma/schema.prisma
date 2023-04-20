@@ -32,20 +32,22 @@ model Account {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  image         String?
-  accounts      Account[]
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  image           String?
+  accounts        Account[]
 
-  summonerName  String?   @unique
-  puuid         String?   @unique
+  summonerName    String?   @unique
+  puuid           String?   @unique
 
-  relationPoint Int @default(0)
-  battlePoint   Int @default(0)
-  tier          Int @default(0)
+  relationPoint   Int @default(0)
+  battlePoint     Int @default(0)
+  tier            Int @default(0)
 
-  participants  Participant[]
+  lastUpdateTime  DateTime?
+
+  participants    Participant[]
 }
 
 model ExternalGame {
@@ -53,7 +55,6 @@ model ExternalGame {
   time          DateTime
   participants  Participant[]
 }
-
 
 model Participant {
   id              String @id @default(cuid())
