@@ -37,10 +37,15 @@ model User {
   email         String?   @unique
   image         String?
   accounts      Account[]
+
+  summonerName  String?   @unique
+
+  relationPoint Int @default(0)
+  battlePoint   Int @default(0)
+  tier          Int @default(0)
+
   participants  Participant[]
 }
-
-
 
 model ExternalGame {
   id            String @id @default(cuid())
