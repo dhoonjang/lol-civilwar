@@ -1,11 +1,10 @@
 // These styles apply to every route in the application
 import '@/styles/globals.css';
-import { Inter } from '@next/font/google';
+import { Inter } from 'next/font/google';
 import Toaster from '@/components/toaster';
 
 const inter = Inter({
   variable: '--font-inter',
-  subsets: [],
 });
 
 export default async function RootLayout({

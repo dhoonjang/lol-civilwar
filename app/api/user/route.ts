@@ -14,6 +14,7 @@ export async function PATCH() {
       relationPoint: {
         increment: 1,
       },
+      pointUpdateTime: new Date(),
     },
   });
 

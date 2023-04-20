@@ -40,30 +40,21 @@ model User {
 
   summonerName    String?   @unique
   puuid           String?   @unique
+  tier            Int @default(0)
 
   relationPoint   Int @default(0)
   battlePoint     Int @default(0)
-  tier            Int @default(0)
+  pointUpdateTime  DateTime? 
 
-  lastUpdateTime  DateTime? @updatedAt
-
-  participants    Participant[]
+  comments    Comment[]
 }
 
-model ExternalGame {
-  id            String @id @default(cuid())
-  time          DateTime
-  participants  Participant[]
-}
-
-model Participant {
+model Comment {
   id              String @id @default(cuid())
-  externalGameId  String
+  matchId         String
   userId          String
-  externalGame ExternalGame @relation(fields: [externalGameId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, externalGameId])
-  @@index([externalGameId])
+  @@unique([userId, matchId])
   @@index([userId])
 }
