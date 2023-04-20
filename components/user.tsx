@@ -33,15 +33,6 @@ export const UpdatePoint = () => {
   );
 };
 
-export const SignOut = () => (
-  <button
-    className="text-stone-400 hover:text-stone-200 transition-all"
-    onClick={() => signOut()}
-  >
-    로그아웃
-  </button>
-);
-
 export const RegisterSummoner = () => {
   const { refresh } = useRouter();
 

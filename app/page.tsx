@@ -1,11 +1,8 @@
-import { UpdatePoint, SignOut, RegisterSummoner } from '@/components/user';
-import { getUserInfo } from 'api/users';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { UserSection } from './components';
 
 const Home = async () => {
-  const user = await getUserInfo();
-  if (!user) redirect('/login');
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Image
@@ -19,15 +16,11 @@ const Home = async () => {
         <h1 className="text-stone-200 font-bold text-2xl">
           제 2회 찌질이들의 롤대회
         </h1>
-        <p className="text-stone-200 mt-5">{user.name}</p>
-        <UpdatePoint />
-        <SignOut />
       </div>
-      {user.summonerName ? (
-        <p className="text-stone-200">{user.summonerName}</p>
-      ) : (
-        <RegisterSummoner />
-      )}
+      <Suspense>
+        {/* @ts-expect-error Server Component */}
+        <UserSection />
+      </Suspense>
     </div>
   );
 };
