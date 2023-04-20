@@ -37,4 +37,26 @@ model User {
   email         String?   @unique
   image         String?
   accounts      Account[]
+  participants  Participant[]
+}
+
+
+
+model ExternalGame {
+  id            String @id @default(cuid())
+  time          DateTime
+  participants  Participant[]
+}
+
+
+model Participant {
+  id              String @id @default(cuid())
+  externalGameId  String
+  userId          String
+  externalGame ExternalGame @relation(fields: [externalGameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, externalGameId])
+  @@index([externalGameId])
+  @@index([userId])
 }

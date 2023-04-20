@@ -1,7 +1,10 @@
+import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
+import { authOptions } from 'pages/api/auth/[...nextauth]';
 
-export default function Home() {
+const Home = async () => {
+  console.log(await getServerSession(authOptions));
   return (
     <div className="flex h-screen bg-black">
       <div className="w-screen h-screen flex flex-col justify-center items-center">
@@ -50,4 +53,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;

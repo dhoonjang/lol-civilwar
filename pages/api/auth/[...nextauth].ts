@@ -15,6 +15,14 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: 'jwt',
   },
+  callbacks: {
+    session: ({ session, token }) => {
+      if (session.user) {
+        session.user.id = token.sub;
+      }
+      return session;
+    },
+  },
 };
 
 export default NextAuth(authOptions);
