@@ -7,6 +7,9 @@ const nextConfig = {
     appDir: true,
     serverComponentsExternalPackages: ['prisma', '@prisma/client'],
   },
+  images: {
+    domains: ['cdn.discordapp.com'],
+  },
 };
 
 module.exports = nextConfig;

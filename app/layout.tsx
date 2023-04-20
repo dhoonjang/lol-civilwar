@@ -5,7 +5,12 @@ import Toaster from '@/components/toaster';
 
 const inter = Inter({
   variable: '--font-inter',
+  subsets: [],
 });
+
+export const metadata = {
+  title: '찌질이들의 롤대회',
+};
 
 export default async function RootLayout({
   children,
@@ -14,7 +19,6 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head></head>
       <body className={inter.variable}>
         <Toaster />
         {children}
