@@ -1,6 +1,14 @@
 'use client';
 import { User } from '@prisma/client';
-import { FC, FormEvent, startTransition, useCallback, useState } from 'react';
+import {
+  FC,
+  FormEvent,
+  startTransition,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-hot-toast';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image';
@@ -44,6 +52,7 @@ export const RegisterSummoner = () => {
         method: 'PUT',
         body: JSON.stringify({
           summonerName: e.currentTarget.summonerName.value,
+          tier: e.currentTarget.tier.value,
         }),
       });
       const user: User = await response.json();
@@ -61,6 +70,7 @@ export const RegisterSummoner = () => {
   return (
     <form onSubmit={handleSubmit}>
       <input id="summonerName" />
+      <input id="tier" type="number" />
       <button
         className="text-stone-400 hover:text-stone-200 transition-all"
         type="submit"
@@ -72,10 +82,26 @@ export const RegisterSummoner = () => {
 };
 
 export const ProfileIcon: FC<User> = ({ image }) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      setToggleOpen(false);
+    };
+
+    document.addEventListener('mousedown', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+    };
+  }, [ref]);
 
   return (
     <div
+      ref={ref}
       className="fixed top-4 right-4 cursor-pointer"
       onClick={() => setToggleOpen((isOpen) => !isOpen)}
     >

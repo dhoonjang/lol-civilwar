@@ -31,7 +31,10 @@ export async function PUT(request: Request) {
     where: {
       id: user.id,
     },
-    data,
+    data: {
+      summonerName: data.summonerName,
+      tier: Number(data.tier),
+    },
   });
 
   return NextResponse.json(updatedUser);

@@ -1,6 +1,24 @@
+import { RegisterSummoner, UpdatePoint } from '@/components/user';
+import { getUserInfo } from 'api/users';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { UserSection } from './components';
+
+const UserSection = async () => {
+  const user = await getUserInfo();
+
+  if (!user) return null;
+  if (!user.summonerName) return <RegisterSummoner />;
+
+  return (
+    <div className="bg-slate-800 divider shadow-md shadow-slate-700 rounded-md px-8 py-4">
+      <p className="text-stone-300 mb-4">
+        <span className="font-bold text-stone-100">{user.summonerName}</span>{' '}
+        [RP: {user.relationPoint} / BP: {user.battlePoint}]
+      </p>
+      <UpdatePoint />
+    </div>
+  );
+};
 
 const Home = async () => {
   return (
