@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { positionOptions } from 'utils';
 
 export const UpdatePoint = () => {
   const { refresh } = useRouter();
@@ -32,16 +33,14 @@ export const UpdatePoint = () => {
   }, [refresh]);
 
   return (
-    <button
-      className="text-stone-400 hover:text-stone-200 transition-all"
-      onClick={handleClick}
-    >
+    <button className="text-btn" onClick={handleClick}>
       포인트 업데이트
     </button>
   );
 };
 
 export const RegisterSummoner = () => {
+  const [mainPosition, setMainPosition] = useState('null');
   const { refresh } = useRouter();
 
   const handleSubmit = useCallback(
@@ -68,20 +67,53 @@ export const RegisterSummoner = () => {
   );
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input id="summonerName" />
-      <input id="tier" type="number" />
-      <button
-        className="text-stone-400 hover:text-stone-200 transition-all"
-        type="submit"
+    <form onSubmit={handleSubmit} className="flex gap-2 flex-col">
+      <input
+        id="summonerName"
+        placeholder="소환사명"
+        className="w-64 text-center"
+      />
+      <select id="tier" className="w-64">
+        <option value={5}>아이언</option>
+        <option value={15}>브론즈</option>
+        <option value={25}>실버</option>
+        <option value={35}>골드</option>
+        <option value={45}>플래티넘</option>
+        <option value={55}>다이아</option>
+        <option value={65}>마스터</option>
+      </select>
+      <select
+        id="position"
+        className="w-64"
+        onChange={(e) => setMainPosition(e.currentTarget.value)}
       >
+        <option value="null">포지션 상관없음</option>
+        {positionOptions.map((opt) => (
+          <option value={opt.value} key={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      {mainPosition !== 'null' && (
+        <select id="subPosition" className="w-64">
+          <option value="null">부포지션 상관없음</option>
+          {positionOptions
+            .filter((opt) => opt.value !== mainPosition)
+            .map(({ value, label }) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
+        </select>
+      )}
+      <button className="btn btn-blue w-64" type="submit">
         제출
       </button>
     </form>
   );
 };
 
-export const ProfileIcon: FC<User> = ({ image }) => {
+export const ProfileIcon: FC<Omit<User, 'pointUpdateTime'>> = ({ image }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
 
@@ -100,28 +132,36 @@ export const ProfileIcon: FC<User> = ({ image }) => {
   }, [ref]);
 
   return (
-    <div
-      ref={ref}
-      className="fixed top-4 right-4 cursor-pointer"
-      onClick={() => setToggleOpen((isOpen) => !isOpen)}
-    >
+    <div ref={ref} className="fixed top-4 right-4">
       <Image
         src={image || ''}
         alt=""
-        className="w-10 h-10 rounded-full"
+        className="w-8 h-8 rounded-full cursor-pointer"
         width={40}
         height={40}
+        onClick={() => setToggleOpen((isOpen) => !isOpen)}
       />
       {toggleOpen && (
-        <button
-          className="absolute right-0 top-12 w-16 text-stone-400 hover:text-stone-200 transition-all"
-          onClick={(e) => {
-            e.stopPropagation();
-            signOut();
-          }}
-        >
-          로그아웃
-        </button>
+        <div className="flex flex-col absolute right-0 top-12 gap-1 w-32 items-end">
+          <button
+            className="text-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open('https://discord.gg/btdvPBpp');
+            }}
+          >
+            디스코드 채널
+          </button>
+          <button
+            className="text-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              signOut();
+            }}
+          >
+            로그아웃
+          </button>
+        </div>
       )}
     </div>
   );

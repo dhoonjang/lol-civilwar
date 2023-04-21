@@ -1,21 +1,37 @@
 import { RegisterSummoner, UpdatePoint } from '@/components/user';
 import { getUserInfo } from 'api/users';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Suspense } from 'react';
+import { getTierInfo } from 'utils';
 
 const UserSection = async () => {
   const user = await getUserInfo();
 
   if (!user) return null;
   if (!user.summonerName) return <RegisterSummoner />;
-
+  const tierInfo = getTierInfo(user.tier || 0);
   return (
-    <div className="bg-slate-800 divider shadow-md shadow-slate-700 rounded-md px-8 py-4">
-      <p className="text-stone-300 mb-4">
-        <span className="font-bold text-stone-100">{user.summonerName}</span>{' '}
-        [RP: {user.relationPoint} / BP: {user.battlePoint}]
-      </p>
-      <UpdatePoint />
+    <div className="flex rounded-md p-4 py-2 border-slate-400 border items-center gap-4">
+      <div>
+        <Image
+          src={tierInfo.tierImage}
+          alt={tierInfo.tierName}
+          className="w-16 h-16"
+        />
+        <p className="text-stone-100 text-center">
+          {tierInfo.tierName} [{tierInfo.tierNumber}]
+        </p>
+      </div>
+      <div className="flex flex-col justify-between items-end h-16">
+        <p className="text-stone-300">
+          <span className="font-bold text-stone-100 text-lg mr-2">
+            {user.summonerName}
+          </span>
+          [RP: {user.relationPoint} / BP: {user.battlePoint}]
+        </p>
+        <UpdatePoint />
+      </div>
     </div>
   );
 };
@@ -24,21 +40,27 @@ const Home = async () => {
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Image
-        width={512}
-        height={512}
+        width={160}
+        height={160}
         src="/riotgames.webp"
         alt="Platforms on Vercel"
         className="w-40 h-40"
       />
-      <div className="text-center max-w-screen-sm mb-10">
-        <h1 className="text-stone-200 font-bold text-2xl">
-          제 2회 찌질이들의 롤대회
-        </h1>
-      </div>
+      <h1 className="text-stone-200 font-bold text-2xl text-center mb-10">
+        제 2회 찌질이들의 롤대회
+      </h1>
       <Suspense>
         {/* @ts-expect-error Server Component */}
         <UserSection />
       </Suspense>
+      <div className="container max-w-md flex justify-around mt-8">
+        <Link href="/members" className="text-lg text-btn">
+          참가자 목록
+        </Link>
+        <Link href="/members" className="text-lg text-btn">
+          내전 생성
+        </Link>
+      </div>
     </div>
   );
 };

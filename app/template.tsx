@@ -3,10 +3,14 @@ import { getUserInfo } from 'api/users';
 
 async function Template({ children }: { children: React.ReactNode }) {
   const user = await getUserInfo();
-
+  let profile = null;
+  if (user) {
+    const { pointUpdateTime, ...rest } = user;
+    profile = { ...rest };
+  }
   return (
     <div className="flex h-screen bg-black">
-      {user && <ProfileIcon {...user} />}
+      {profile && <ProfileIcon {...profile} />}
       {children}
     </div>
   );

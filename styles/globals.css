@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply text-stone-200;
+}
+
+input {
+  background: none;
+  outline: none;
+  display: block;
+  @apply text-stone-200 h-10 px-2;
+}
+
+input::placeholder {
+  @apply text-stone-400;
+}
+
+select {
+  display: block;
+  background: none;
+  outline: none;
+  @apply w-40 h-10 text-stone-200 px-2;
+}
+
+.btn {
+  @apply font-bold h-10 px-4 rounded transition-all;
+}
+.btn-blue {
+  @apply bg-slate-500 text-white;
+}
+.btn-blue:hover {
+  @apply bg-slate-700;
+}
+
+.text-btn {
+  @apply text-stone-400 hover:text-stone-200 transition-all;
+}
