@@ -1,5 +1,5 @@
 import { RegisterSummoner, UpdatePoint } from '@/components/user';
-import { getUserInfo } from 'api/users';
+import { getUserInfo } from 'db/users';
 import { differenceInMinutes, format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -1,6 +1,6 @@
 import { HomeIcon } from '@/components/home';
 import { ProfileIcon } from '@/components/user';
-import { getUserInfo } from 'api/users';
+import { getUserInfo } from 'db/users';
 
 async function Template({ children }: { children: React.ReactNode }) {
   const user = await getUserInfo();

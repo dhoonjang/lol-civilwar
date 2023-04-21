@@ -1,4 +1,4 @@
-import { getUserList } from 'api/users';
+import { getUserList } from 'db/users';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTierInfo } from 'utils';

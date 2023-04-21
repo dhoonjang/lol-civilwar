@@ -1,4 +1,4 @@
-import { getUserInfo } from 'api/users';
+import { getUserInfo } from 'db/users';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
