@@ -1,5 +1,6 @@
 import { getUserList } from 'api/users';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getTierInfo } from 'utils';
 
 const Members = async () => {
@@ -11,8 +12,9 @@ const Members = async () => {
         (user) => {
           const tierInfo = getTierInfo(user.tier || 0);
           return (
-            <div
-              className="flex rounded-md p-4 py-2 border-slate-400 border items-center justify-around"
+            <Link
+              href={`/members/${user.id}`}
+              className="flex rounded-md p-4 py-2 border-slate-400 border items-center justify-around hover:bg-slate-900"
               key={user.id}
             >
               <div>
@@ -33,7 +35,7 @@ const Members = async () => {
                   [RP: {user.relationPoint} / BP: {user.battlePoint}]
                 </p>
               </div>
-            </div>
+            </Link>
           );
         }
       )}
