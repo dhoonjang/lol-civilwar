@@ -1,5 +1,4 @@
-import { HomeIcon } from '@/components/home';
-import { ProfileIcon } from '@/components/user';
+import { HomeIcon, ProfileIcon } from '@/components/layout';
 import { getUserInfo } from 'db/users';
 
 async function Template({ children }: { children: React.ReactNode }) {

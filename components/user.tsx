@@ -144,7 +144,7 @@ export const ProfileIcon: FC<Omit<User, 'pointUpdateTime'>> = ({ image }) => {
         onClick={() => setToggleOpen((isOpen) => !isOpen)}
       />
       {toggleOpen && (
-        <div className="flex flex-col absolute right-0 top-12 gap-1 w-32 items-end">
+        <div className="flex flex-col absolute right-0 top-12 gap-1 w-24 items-end rounded bg-black/50">
           <button
             className="text-btn"
             onClick={(e) => {
