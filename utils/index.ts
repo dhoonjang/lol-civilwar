@@ -1,13 +1,13 @@
 import { StaticImageData } from 'next/image';
-import ironImage from '@/assets/iron.png';
-import bronzeImage from '@/assets/bronze.png';
-import silverImage from '@/assets/silver.png';
-import goldImage from '@/assets/gold.png';
-import platinumImage from '@/assets/platinum.png';
-import diamondImage from '@/assets/diamond.png';
-import masterImage from '@/assets/master.png';
-import grandMasterImage from '@/assets/grandMaster.png';
-import challengerImage from '@/assets/challenger.png';
+import ironImage from 'assets/iron.png';
+import bronzeImage from 'assets/bronze.png';
+import silverImage from 'assets/silver.png';
+import goldImage from 'assets/gold.png';
+import platinumImage from 'assets/platinum.png';
+import diamondImage from 'assets/diamond.png';
+import masterImage from 'assets/master.png';
+import grandMasterImage from 'assets/grandMaster.png';
+import challengerImage from 'assets/challenger.png';
 
 export const positionOptions = [
   {
