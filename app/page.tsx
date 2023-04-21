@@ -1,5 +1,6 @@
 import { RegisterSummoner, UpdatePoint } from '@/components/user';
 import { getUserInfo } from 'api/users';
+import { differenceInMinutes, format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -11,6 +12,10 @@ const UserSection = async () => {
   if (!user) return null;
   if (!user.summonerName) return <RegisterSummoner />;
   const tierInfo = getTierInfo(user.tier || 0);
+  const pointUpdateTime = differenceInMinutes(
+    Date.now(),
+    user.pointUpdateTime ?? Date.now()
+  );
   return (
     <div className="flex rounded-md p-4 py-2 border-slate-400 border items-center gap-4">
       <div>
@@ -30,7 +35,13 @@ const UserSection = async () => {
           </span>
           [RP: {user.relationPoint} / BP: {user.battlePoint}]
         </p>
-        <UpdatePoint />
+        <UpdatePoint
+          pointUpdateTime={
+            pointUpdateTime
+              ? `최근 업데이트 ${pointUpdateTime}분 전`
+              : '포인트 업데이트'
+          }
+        />
       </div>
     </div>
   );
@@ -59,6 +70,9 @@ const Home = async () => {
         </Link>
         <Link href="/members" className="text-lg text-btn">
           내전 생성
+        </Link>
+        <Link href="/members" className="text-lg text-btn">
+          팀 결성
         </Link>
       </div>
     </div>

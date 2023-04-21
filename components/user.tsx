@@ -15,7 +15,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { positionOptions } from 'utils';
 
-export const UpdatePoint = () => {
+export const UpdatePoint: FC<{ pointUpdateTime: string }> = ({
+  pointUpdateTime,
+}) => {
   const { refresh } = useRouter();
 
   const handleClick = useCallback(async () => {
@@ -34,7 +36,7 @@ export const UpdatePoint = () => {
 
   return (
     <button className="text-btn" onClick={handleClick}>
-      포인트 업데이트
+      {pointUpdateTime}
     </button>
   );
 };
@@ -107,7 +109,7 @@ export const RegisterSummoner = () => {
         </select>
       )}
       <button className="btn btn-blue w-64" type="submit">
-        제출
+        소환사 등록
       </button>
     </form>
   );
