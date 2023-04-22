@@ -1,11 +1,11 @@
 import { RegisterSummoner, UpdatePoint, UserCard } from '@/components/user';
-import { getUserInfo } from 'db/users';
+import { getMyInfo } from 'domain/user';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
 const UserSection = async () => {
-  const user = await getUserInfo();
+  const user = await getMyInfo();
 
   if (!user) return null;
   if (!user.summonerName) return <RegisterSummoner />;

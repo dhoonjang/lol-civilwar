@@ -1,8 +1,8 @@
 import { HomeIcon, Navigation, ProfileIcon } from '@/components/layout';
-import { getUserInfo } from 'db/users';
+import { getMyInfo } from 'domain/user';
 
 async function Template({ children }: { children: React.ReactNode }) {
-  const user = await getUserInfo();
+  const user = await getMyInfo();
   let profile = null;
   if (user) {
     const { pointUpdateTime, ...rest } = user;

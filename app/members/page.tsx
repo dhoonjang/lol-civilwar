@@ -1,5 +1,5 @@
 import { UserCard } from '@/components/user';
-import { getUserList } from 'db/users';
+import { getUserList } from 'domain/user';
 import Link from 'next/link';
 
 const Members = async () => {

@@ -1,10 +1,10 @@
-import { getUserInfo } from 'db/users';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchToRiot } from '@/utils/index';
+import { getMyInfo } from 'domain/user';
 
 export async function PATCH() {
-  const user = await getUserInfo();
+  const user = await getMyInfo();
 
   if (!user || !prisma) return NextResponse.error();
 
@@ -25,7 +25,7 @@ export async function PATCH() {
 
 export async function PUT(request: Request) {
   const data = await request.json();
-  const user = await getUserInfo();
+  const user = await getMyInfo();
 
   if (!user || !prisma || !data) return NextResponse.error();
 

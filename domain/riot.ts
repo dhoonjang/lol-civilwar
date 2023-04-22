@@ -1,52 +1,10 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from 'pages/api/auth/[...nextauth]';
-import prisma from '@/lib/prisma';
 import { fetchToRiot } from '../utils';
-
-export const getUserInfo = async () => {
-  const session = await getServerSession(authOptions);
-  if (!session || !prisma) return null;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: session.user.id,
-    },
-  });
-  return user;
-};
-
-export const getUserList = async () => {
-  if (!prisma) return [];
-  const userList = await prisma.user.findMany({
-    where: {
-      summonerName: {
-        not: null,
-      },
-    },
-    include: {
-      comments: true,
-    },
-    orderBy: {
-      tier: 'desc',
-    },
-  });
-  return userList;
-};
-
-export const getMemberInfo = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    include: {
-      comments: true,
-    },
-  });
-
-  return user;
-};
 
 export interface ExternalMatch {
   matchId: string;
+  win: boolean;
+  timestamp: number;
+  duration: number;
   participants: MatchParticipant[];
 }
 
@@ -56,13 +14,18 @@ export interface MatchParticipant {
   puuid: string;
   summonerName: string;
   kills: number;
-  assits: number;
+  assists: number;
   deaths: number;
 }
 
-export const getMatchList = async (puuid: string): Promise<ExternalMatch[]> => {
+export const getMatchList = async (
+  puuid: string,
+  startTime?: number
+): Promise<ExternalMatch[]> => {
   const matchIdList: string[] = await fetchToRiot(
-    `/lol/match/v5/matches/by-puuid/${puuid}/ids`,
+    `/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked${
+      startTime ? `&startTime=${startTime}` : ''
+    }`,
     'asia'
   );
   if (!matchIdList || !Array.isArray(matchIdList)) return [];
@@ -82,6 +45,11 @@ export const getMatchList = async (puuid: string): Promise<ExternalMatch[]> => {
 
   return matchList.map((m) => ({
     matchId: m.metadata.matchId,
+    timestamp: m.info.gameEndTimestamp,
+    duration: m.info.gameDuration,
+    win:
+      m.info.participants.find((p: MatchParticipant) => p.puuid === puuid)
+        ?.win ?? false,
     participants: m.info.participants.map(
       ({
         win,
@@ -89,7 +57,7 @@ export const getMatchList = async (puuid: string): Promise<ExternalMatch[]> => {
         puuid,
         summonerName,
         kills,
-        assits,
+        assists,
         deaths,
       }: MatchParticipant) => ({
         win,
@@ -97,7 +65,7 @@ export const getMatchList = async (puuid: string): Promise<ExternalMatch[]> => {
         puuid,
         summonerName,
         kills,
-        assits,
+        assists,
         deaths,
       })
     ),
