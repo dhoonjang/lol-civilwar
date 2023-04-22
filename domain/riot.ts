@@ -24,10 +24,11 @@ export const getMatchList = async (
 ): Promise<ExternalMatch[]> => {
   const matchIdList: string[] = await fetchToRiot(
     `/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked${
-      startTime ? `&startTime=${startTime}` : ''
+      startTime ? `&startTime=${Math.floor(startTime)}` : ''
     }`,
     'asia'
   );
+
   if (!matchIdList || !Array.isArray(matchIdList)) return [];
 
   const response = await Promise.allSettled(

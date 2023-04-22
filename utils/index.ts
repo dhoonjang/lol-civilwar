@@ -49,56 +49,56 @@ export interface TierInfo {
 }
 
 export const getTierInfo = (tierNumber: number): TierInfo => {
-  if (tierNumber < 10)
-    return {
-      tierName: '아이언',
-      tierNumber: Math.max(1, Math.round(4 - tierNumber * 0.4)),
-      tierImage: ironImage,
-    };
-
   if (tierNumber < 20)
     return {
-      tierName: '브론즈',
-      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 10) * 0.4)),
-      tierImage: bronzeImage,
-    };
-
-  if (tierNumber < 30)
-    return {
-      tierName: '실버',
-      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 20) * 0.4)),
-      tierImage: silverImage,
+      tierName: '아이언',
+      tierNumber: Math.max(1, Math.round(4 - tierNumber * 0.2)),
+      tierImage: ironImage,
     };
 
   if (tierNumber < 40)
     return {
-      tierName: '골드',
-      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 30) * 0.4)),
-      tierImage: goldImage,
-    };
-
-  if (tierNumber < 50)
-    return {
-      tierName: '플래티넘',
-      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 40) * 0.4)),
-      tierImage: platinumImage,
+      tierName: '브론즈',
+      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 20) * 0.2)),
+      tierImage: bronzeImage,
     };
 
   if (tierNumber < 60)
     return {
+      tierName: '실버',
+      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 40) * 0.2)),
+      tierImage: silverImage,
+    };
+
+  if (tierNumber < 80)
+    return {
+      tierName: '골드',
+      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 60) * 0.2)),
+      tierImage: goldImage,
+    };
+
+  if (tierNumber < 100)
+    return {
+      tierName: '플래티넘',
+      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 80) * 0.2)),
+      tierImage: platinumImage,
+    };
+
+  if (tierNumber < 120)
+    return {
       tierName: '다이아',
-      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 50) * 0.4)),
+      tierNumber: Math.max(1, Math.round(4 - (tierNumber - 100) * 0.2)),
       tierImage: diamondImage,
     };
 
-  if (tierNumber < 70)
+  if (tierNumber < 140)
     return {
       tierName: '마스터',
       tierNumber: 1,
       tierImage: masterImage,
     };
 
-  if (tierNumber < 80)
+  if (tierNumber < 160)
     return {
       tierName: '그랜드마스터',
       tierNumber: 1,

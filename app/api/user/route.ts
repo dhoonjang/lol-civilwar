@@ -2,11 +2,43 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchToRiot } from '@/utils/index';
 import { getMyInfo } from 'domain/user';
+import { getMatchList } from 'domain/riot';
 
 export async function PATCH() {
   const user = await getMyInfo();
 
-  if (!user || !prisma) return NextResponse.error();
+  if (!user?.puuid || !prisma) return NextResponse.error();
+
+  const matchList = await getMatchList(
+    user.puuid,
+    user.pointUpdateTime ? user.pointUpdateTime.getTime() / 1000 : undefined
+  );
+
+  const puuidList = await prisma.user.findMany({
+    where: {
+      puuid: {
+        not: null,
+      },
+    },
+    select: {
+      puuid: true,
+    },
+  });
+
+  const [rpIncrementPoint, bpIncrementPoint] = matchList.reduce<
+    [number, number]
+  >(
+    (prev, match) => {
+      const participantCount = match.participants.filter((p) =>
+        puuidList.map((p) => p.puuid).includes(p.puuid)
+      ).length;
+      return [
+        prev[0] + participantCount,
+        prev[1] + (match.win ? participantCount : 0),
+      ];
+    },
+    [0, 0]
+  );
 
   const updatedUser = await prisma.user.update({
     where: {
@@ -14,7 +46,10 @@ export async function PATCH() {
     },
     data: {
       relationPoint: {
-        increment: 1,
+        increment: rpIncrementPoint,
+      },
+      battlePoint: {
+        increment: bpIncrementPoint,
       },
       pointUpdateTime: new Date(),
     },

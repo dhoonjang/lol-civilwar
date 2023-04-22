@@ -126,13 +126,13 @@ export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
         className="w-64 text-center"
       />
       <select id="tier" className="w-64">
-        <option value={5}>아이언</option>
-        <option value={15}>브론즈</option>
-        <option value={25}>실버</option>
-        <option value={35}>골드</option>
-        <option value={45}>플래티넘</option>
-        <option value={55}>다이아</option>
-        <option value={65}>마스터</option>
+        <option value={10}>아이언</option>
+        <option value={30}>브론즈</option>
+        <option value={50}>실버</option>
+        <option value={70}>골드</option>
+        <option value={90}>플래티넘</option>
+        <option value={110}>다이아</option>
+        <option value={130}>마스터</option>
       </select>
       <select
         id="position"

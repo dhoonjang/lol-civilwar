@@ -1,5 +1,5 @@
 import { UserCard } from '@/components/user';
-import { format } from 'date-fns';
+import { format, sub } from 'date-fns';
 import { MatchParticipant, getMatchList } from 'domain/riot';
 import { UserComplete, getMyInfo, getUser } from 'domain/user';
 import { redirect } from 'next/navigation';
@@ -38,7 +38,10 @@ const MatchList = async ({
   me: UserComplete;
   user: UserComplete;
 }) => {
-  const matchList = await getMatchList(user.puuid);
+  const matchList = await getMatchList(
+    user.puuid,
+    sub(new Date(), { days: 2 }).getTime() / 1000
+  );
   const matchWithMeList = matchList.filter((match) =>
     match.participants.map((p) => p.puuid).includes(me.puuid ?? '')
   );
