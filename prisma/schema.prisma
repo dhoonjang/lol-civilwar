@@ -58,6 +58,8 @@ model User {
   pointUpdateTime  DateTime? 
 
   comments    Comment[]
+  participants Participant[]
+  bettors Bettor[]
 }
 
 model Comment {
@@ -71,4 +73,58 @@ model Comment {
 
   @@unique([userId, matchId])
   @@index([userId])
+}
+
+enum CivilWarStatus {
+  TEAM_BUILDING
+  BATTING
+  STARTED
+  END
+}
+
+model CivilWar {
+  id            String @id @default(cuid())
+  status        CivilWarStatus @default(TEAM_BUILDING)
+  participants  Participant[]
+  teams         CivilWarTeam[]
+}
+
+model CivilWarTeam {
+  id            String @id @default(cuid())
+  civilWarId    String
+  
+  civilWar  CivilWar @relation(fields: [civilWarId], references: [id], onDelete: Cascade)
+  members Participant[]
+  bettors Bettor[]
+
+  @@index([civilWarId])
+}
+
+model Bettor {
+  id             String @id @default(cuid())
+  userId         String
+  civilWarTeamId String
+  batPoint       Int
+  totalPoint     Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  civilWarTeam CivilWarTeam @relation(fields: [civilWarTeamId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([civilWarTeamId])
+}
+
+model Participant {
+  id              String @id @default(cuid())
+  civilWarId      String
+  userId          String
+  civilWarTeamId  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  civilWar CivilWar @relation(fields: [civilWarId], references: [id], onDelete: Cascade)
+  civilWarTeam CivilWarTeam? @relation(fields: [civilWarTeamId], references: [id], onDelete: Cascade)
+
+  @@index([civilWarId])
+  @@index([userId])
+  @@index([civilWarTeamId])
 }

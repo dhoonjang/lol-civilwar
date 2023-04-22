@@ -15,6 +15,10 @@ export const getUserInfo = async () => {
 
 export const getUserList = async () => {
   if (!prisma) return [];
-  const userList = await prisma.user.findMany();
+  const userList = await prisma.user.findMany({
+    include: {
+      comments: true,
+    },
+  });
   return userList;
 };

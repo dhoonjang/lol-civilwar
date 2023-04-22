@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply text-stone-200;
+  @apply text-stone-100;
 }
 
 input {
@@ -28,7 +28,7 @@ select {
   @apply font-bold h-10 px-4 rounded transition-all;
 }
 .btn-blue {
-  @apply bg-slate-500 text-white;
+  @apply bg-slate-800 text-white;
 }
 .btn-blue:hover {
   @apply bg-slate-700;
@@ -36,4 +36,11 @@ select {
 
 .text-btn {
   @apply text-stone-400 hover:text-stone-200 transition-all;
+}
+
+.card {
+  @apply border border-gray-700 rounded-xl shadow-md shadow-gray-800 p-6 transition-all;
+}
+.card-btn:hover {
+  @apply shadow-lg shadow-gray-800;
 }

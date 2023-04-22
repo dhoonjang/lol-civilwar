@@ -5,7 +5,15 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        roman: ['var(--font-roman)'],
+      },
+    },
+    screens: {
+      sm: '640px',
+      md: '1024px',
+    },
     container: {
       center: true,
     },

@@ -8,16 +8,29 @@ import { FC, useEffect, useRef, useState } from 'react';
 
 export const HomeIcon = () => {
   return (
-    <div className="fixed top-4 left-2">
-      <Link href="/" className="flex items-center">
-        <Image
-          width={40}
-          height={40}
-          src="/riotgames.webp"
-          alt="riotgames"
-          className="w-10 h-10"
-        />
-        <h2 className="text-stone-200 font-bold text-lg">찌질이들의 롤대회</h2>
+    <Link href="/" className="flex items-center">
+      <Image
+        width={40}
+        height={40}
+        src="/riotgames.webp"
+        alt="riotgames"
+        className="w-12 h-12"
+      />
+    </Link>
+  );
+};
+
+export const Navigation = () => {
+  return (
+    <div className="flex gap-4 items-center">
+      <Link href="/members" className="text-btn">
+        참가자
+      </Link>
+      <Link href="/members" className="text-btn">
+        내전
+      </Link>
+      <Link href="/members" className="text-btn">
+        팀
       </Link>
     </div>
   );
@@ -42,7 +55,7 @@ export const ProfileIcon: FC<Omit<User, 'pointUpdateTime'>> = ({ image }) => {
   }, [ref]);
 
   return (
-    <div ref={ref} className="fixed top-4 right-4">
+    <div ref={ref} className="mr-2 relative">
       <Image
         src={image || ''}
         alt=""

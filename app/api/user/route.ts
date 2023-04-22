@@ -35,6 +35,8 @@ export async function PUT(request: Request) {
     data: {
       summonerName: data.summonerName,
       tier: Number(data.tier),
+      position: data.position !== 'null' ? data.position : undefined,
+      subPosition: data.subPosition !== 'null' ? data.subPosition : undefined,
     },
   });
 

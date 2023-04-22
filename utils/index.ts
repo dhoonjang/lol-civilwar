@@ -8,27 +8,37 @@ import diamondImage from '@/assets/diamond.png';
 import masterImage from '@/assets/master.png';
 import grandMasterImage from '@/assets/grandmaster.png';
 import challengerImage from '@/assets/challenger.png';
+import topImage from '@/assets/top.svg';
+import jungleImage from '@/assets/jungle.svg';
+import midImage from '@/assets/mid.svg';
+import adcImage from '@/assets/adc.svg';
+import supportImage from '@/assets/support.svg';
 
 export const positionOptions = [
   {
     label: '탑 라이너',
-    value: 'top',
+    value: 'TOP',
+    image: topImage,
   },
   {
     label: '정글러',
-    value: 'jungle',
+    value: 'JUNGLE',
+    image: jungleImage,
   },
   {
     label: '미드 라이너',
-    value: 'mid',
+    value: 'MID',
+    image: midImage,
   },
   {
     label: '원거리 딜러',
-    value: 'adc',
+    value: 'ADC',
+    image: adcImage,
   },
   {
     label: '서포터',
-    value: 'support',
+    value: 'SUPPORT',
+    image: supportImage,
   },
 ];
 
