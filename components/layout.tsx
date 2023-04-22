@@ -26,10 +26,10 @@ export const Navigation = () => {
       <Link href="/members" className="text-btn">
         참가자
       </Link>
-      <Link href="/members" className="text-btn">
+      <Link href="/civilwars" className="text-btn">
         내전
       </Link>
-      <Link href="/members" className="text-btn">
+      <Link href="/teams" className="text-btn">
         팀
       </Link>
     </div>
