@@ -111,3 +111,17 @@ export const getTierInfo = (tierNumber: number): TierInfo => {
     tierImage: challengerImage,
   };
 };
+
+export const fetchToRiot = async (url: string, region?: string) => {
+  const response = await fetch(
+    `https://${region ?? 'kr'}.api.riotgames.com${url}`,
+    {
+      headers: {
+        'X-Riot-Token': process.env.RIOT_API_KEY ?? '',
+      },
+      cache: 'force-cache',
+    }
+  );
+
+  return await response.json();
+};

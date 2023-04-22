@@ -41,6 +41,9 @@ select {
 .card {
   @apply border border-gray-700 rounded-xl shadow-md shadow-gray-800 p-6 transition-all;
 }
+.card-btn {
+  @apply relative bottom-0;
+}
 .card-btn:hover {
-  @apply shadow-lg shadow-gray-800;
+  @apply shadow-lg shadow-gray-800 bottom-1 relative;
 }

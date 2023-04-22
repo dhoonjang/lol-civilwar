@@ -87,7 +87,9 @@ export const UpdatePoint: FC = () => {
   );
 };
 
-export const RegisterSummoner = () => {
+export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
+  createMode,
+}) => {
   const [mainPosition, setMainPosition] = useState('null');
   const { refresh } = useRouter();
 
@@ -96,7 +98,7 @@ export const RegisterSummoner = () => {
       e.preventDefault();
 
       const response = await fetch('/api/user', {
-        method: 'PUT',
+        method: createMode ? 'POST' : 'PUT',
         body: JSON.stringify({
           summonerName: e.currentTarget.summonerName.value,
           tier: e.currentTarget.tier.value,
@@ -113,7 +115,7 @@ export const RegisterSummoner = () => {
 
       startTransition(refresh);
     },
-    [refresh]
+    [refresh, createMode]
   );
 
   return (

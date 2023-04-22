@@ -60,19 +60,24 @@ model User {
   comments    Comment[]
   participants Participant[]
   bettors Bettor[]
+
+  writedComments  Comment[] @relation("Writer")
 }
 
 model Comment {
   id              String @id @default(cuid())
   matchId         String
   userId          String
+  writerId        String
   comment         String
   tierChange      Int @default(0)
   
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  writer  User @relation("Writer", fields: [writerId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, matchId])
+  @@unique([userId, matchId, writerId])
   @@index([userId])
+  @@index([writerId])
 }
 
 enum CivilWarStatus {
