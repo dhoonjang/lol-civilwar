@@ -11,7 +11,7 @@ export async function PATCH() {
 
   const matchIdList = await getRiotMatchIdList(
     user.puuid,
-    user.pointUpdateTime ? user.pointUpdateTime.getTime() / 1000 : undefined
+    user.pointUpdateTime.getTime() / 1000
   );
 
   const matchList = await getRiotMatchList(matchIdList);
