@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from 'pages/api/auth/[...nextauth]';
 import prisma from '@/lib/prisma';
 import { User } from '@prisma/client';
+import { exclude } from '../utils';
 
 export type UserComplete = User & {
   summonerName: string;
@@ -19,9 +20,9 @@ export const getMyInfo = async () => {
   return user;
 };
 
-export const getMyComments = async () => {
+export const getMyInfoWithComments = async () => {
   const session = await getServerSession(authOptions);
-  if (!session) return [];
+  if (!session) return null;
   const user = await prisma.user.findUnique({
     where: {
       id: session.user.id,
@@ -30,13 +31,13 @@ export const getMyComments = async () => {
       writedComments: true,
     },
   });
-  return user?.writedComments ?? [];
+  return user;
 };
 
 export const getUserList = async () => {
   const userList = await prisma.user.findMany({
     where: {
-      summonerName: {
+      puuid: {
         not: null,
       },
     },
@@ -64,5 +65,21 @@ export const getUser = async (userId: string) => {
     },
   });
 
-  return user;
+  if (user) return exclude(user, ['pointUpdateTime']);
+  return null;
+};
+
+export const getPuuidList = async (): Promise<string[]> => {
+  const puuidList = await prisma.user.findMany({
+    where: {
+      puuid: {
+        not: null,
+      },
+    },
+    select: {
+      puuid: true,
+    },
+  });
+
+  return puuidList.map((p) => p.puuid).filter((p): p is string => p !== null);
 };

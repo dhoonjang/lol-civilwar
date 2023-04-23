@@ -2,7 +2,6 @@ import { fetchToRiot } from '../utils';
 
 export interface ExternalMatch {
   matchId: string;
-  win: boolean;
   timestamp: number;
   duration: number;
   participants: MatchParticipant[];
@@ -18,19 +17,27 @@ export interface MatchParticipant {
   deaths: number;
 }
 
-export const getMatchList = async (
+export const getRiotMatchIdList = async (
   puuid: string,
   startTime?: number
+): Promise<string[]> => {
+  try {
+    const idList = await fetchToRiot(
+      `/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked${
+        startTime ? `&startTime=${Math.floor(startTime)}` : ''
+      }`,
+      'asia'
+    );
+
+    return Array.isArray(idList) ? idList : [];
+  } catch {
+    return [];
+  }
+};
+
+export const getRiotMatchList = async (
+  matchIdList: string[]
 ): Promise<ExternalMatch[]> => {
-  const matchIdList: string[] = await fetchToRiot(
-    `/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked${
-      startTime ? `&startTime=${Math.floor(startTime)}` : ''
-    }`,
-    'asia'
-  );
-
-  if (!matchIdList || !Array.isArray(matchIdList)) return [];
-
   const response = await Promise.allSettled(
     matchIdList.map((matchId) =>
       fetchToRiot(`/lol/match/v5/matches/${matchId}`, 'asia')
@@ -44,31 +51,30 @@ export const getMatchList = async (
     )
     .map((r) => r.value);
 
-  return matchList.map((m) => ({
-    matchId: m.metadata.matchId,
-    timestamp: m.info.gameEndTimestamp,
-    duration: m.info.gameDuration,
-    win:
-      m.info.participants.find((p: MatchParticipant) => p.puuid === puuid)
-        ?.win ?? false,
-    participants: m.info.participants.map(
-      ({
-        win,
-        championName,
-        puuid,
-        summonerName,
-        kills,
-        assists,
-        deaths,
-      }: MatchParticipant) => ({
-        win,
-        championName,
-        puuid,
-        summonerName,
-        kills,
-        assists,
-        deaths,
-      })
-    ),
-  }));
+  return matchList
+    .map((m) => ({
+      matchId: m.metadata.matchId,
+      timestamp: m.info.gameEndTimestamp,
+      duration: m.info.gameDuration,
+      participants: m.info.participants.map(
+        ({
+          win,
+          championName,
+          puuid,
+          summonerName,
+          kills,
+          assists,
+          deaths,
+        }: MatchParticipant) => ({
+          win,
+          championName,
+          puuid,
+          summonerName,
+          kills,
+          assists,
+          deaths,
+        })
+      ),
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp);
 };

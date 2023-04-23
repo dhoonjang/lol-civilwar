@@ -66,12 +66,15 @@ model User {
 
 model Comment {
   id              String @id @default(cuid())
+  
   matchId         String
+  matchTimestamp  Int
+
   userId          String
   writerId        String
   comment         String
-  tierChange      Int @default(0)
-  
+  properTier      Int
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   writer  User @relation("Writer", fields: [writerId], references: [id], onDelete: Cascade)
 

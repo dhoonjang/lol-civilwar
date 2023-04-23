@@ -1,40 +1,37 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchToRiot } from '@/utils/index';
-import { getMyInfo } from 'domain/user';
-import { getMatchList } from 'domain/riot';
+import { getMyInfo, getPuuidList } from 'domain/user';
+import { getRiotMatchIdList, getRiotMatchList } from 'domain/riot';
 
 export async function PATCH() {
   const user = await getMyInfo();
 
   if (!user?.puuid || !prisma) return NextResponse.error();
 
-  const matchList = await getMatchList(
+  const matchIdList = await getRiotMatchIdList(
     user.puuid,
     user.pointUpdateTime ? user.pointUpdateTime.getTime() / 1000 : undefined
   );
 
-  const puuidList = await prisma.user.findMany({
-    where: {
-      puuid: {
-        not: null,
-      },
-    },
-    select: {
-      puuid: true,
-    },
-  });
+  const matchList = await getRiotMatchList(matchIdList);
+
+  const puuidList = await getPuuidList();
 
   const [rpIncrementPoint, bpIncrementPoint] = matchList.reduce<
     [number, number]
   >(
     (prev, match) => {
-      const participantCount = match.participants.filter((p) =>
-        puuidList.map((p) => p.puuid).includes(p.puuid)
+      const participantCount = match.participants.filter((participant) =>
+        puuidList.includes(participant.puuid)
       ).length;
+      const win =
+        match.participants.find(
+          (participant) => participant.puuid === user.puuid
+        )?.win ?? false;
       return [
         prev[0] + participantCount,
-        prev[1] + (match.win ? participantCount : 0),
+        prev[1] + (win ? participantCount : 0),
       ];
     },
     [0, 0]
