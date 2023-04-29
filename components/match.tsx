@@ -1,10 +1,7 @@
-import {
-  Comment,
-  ExternalMatchParticipant,
-  ExternalMatch,
-} from '@prisma/client';
+import { ExternalMatchParticipant, ExternalMatch, User } from '@prisma/client';
 import { format } from 'date-fns';
-import { NamedExoticComponent, memo } from 'react';
+import Link from 'next/link';
+import { memo } from 'react';
 
 export const ParticipantView = memo(
   ({
@@ -42,58 +39,64 @@ ParticipantView.displayName = 'ParticipantView';
 
 interface MatchItemProps {
   match: ExternalMatch & {
-    participants: (ExternalMatchParticipant & {
-      comments: Comment[];
-    })[];
+    participants: ExternalMatchParticipant[];
   };
-  puuid: string;
+  userId?: string;
+  userPuuid: string;
   puuidList: string[];
 }
 
-export const MatchItem = memo(({ match, puuid, puuidList }: MatchItemProps) => {
-  const win = match.participants.find((p) => p.puuid === puuid)?.win ?? false;
+export const MatchItem = memo(
+  ({ match, userId, userPuuid, puuidList }: MatchItemProps) => {
+    const win =
+      match.participants.find((p) => p.puuid === userPuuid)?.win ?? false;
 
-  return (
-    <div
-      className={`rounded-xl p-3 flex justify-between items-center ${
-        win ? 'bg-slate-800' : 'bg-red-900'
-      }`}
-    >
-      <div className="text-left w-2/5">
-        {match.participants
-          .filter((p) => p.win)
-          .map((p) => (
-            <ParticipantView
-              {...p}
-              key={p.puuid}
-              borderd={puuidList.includes(p.puuid)}
-              highlighted={p.puuid === puuid}
-            />
-          ))}
-      </div>
-      <div className="text-center">
-        {format(match.timestamp, 'M월 d일 HH:mm')}
-        <div className="mt-1">
-          {Math.floor(match.duration / 60)}분 {match.duration % 60}초
+    return (
+      <div
+        className={`rounded-xl p-3 flex justify-between items-center ${
+          win ? 'bg-slate-800' : 'bg-red-900'
+        }`}
+      >
+        <div className="text-left w-2/5">
+          {match.participants
+            .filter((p) => p.win)
+            .map((p) => (
+              <ParticipantView
+                {...p}
+                key={p.puuid}
+                borderd={puuidList.includes(p.puuid)}
+                highlighted={p.puuid === userPuuid}
+              />
+            ))}
         </div>
-        <div className="mt-3 gap-1 flex flex-col">
-          <button className="btn btn-black text-sm">자세히 보기</button>
+        <div className="text-center">
+          {format(match.timestamp, 'M월 d일 HH:mm')}
+          <div className="mt-1">
+            {Math.floor(match.duration / 60)}분 {match.duration % 60}초
+          </div>
+          {userId && (
+            <div className="mt-3 gap-1 flex flex-col">
+              <Link href={`/members/${userId}/${match.id}`}>
+                <button className="btn btn-black text-sm">자세히 보기</button>
+              </Link>
+            </div>
+          )}
+        </div>
+        <div className="text-right w-2/5">
+          {match.participants
+            .filter((p) => !p.win)
+            .map((p) => (
+              <ParticipantView
+                {...p}
+                key={p.puuid}
+                borderd={puuidList.includes(p.puuid)}
+                highlighted={p.puuid === userPuuid}
+              />
+            ))}
         </div>
       </div>
-      <div className="text-right w-2/5">
-        {match.participants
-          .filter((p) => !p.win)
-          .map((p) => (
-            <ParticipantView
-              {...p}
-              key={p.puuid}
-              borderd={puuidList.includes(p.puuid)}
-              highlighted={p.puuid === puuid}
-            />
-          ))}
-      </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 MatchItem.displayName = 'MatchItem';

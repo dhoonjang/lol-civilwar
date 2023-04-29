@@ -10,13 +10,27 @@ export const getMatchList = async (puuid: string) =>
       },
     },
     include: {
+      participants: true,
+    },
+    orderBy: {
+      timestamp: 'desc',
+    },
+  });
+
+export const getMatch = async (matchId: string) => {
+  const match = await prisma.externalMatch.findUnique({
+    where: {
+      id: matchId,
+    },
+    include: {
       participants: {
         include: {
           comments: true,
         },
       },
     },
-    orderBy: {
-      timestamp: 'desc',
-    },
   });
+
+  if (!match) return null;
+  return match;
+};
