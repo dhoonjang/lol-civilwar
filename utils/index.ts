@@ -119,7 +119,6 @@ export const fetchToRiot = async (url: string, region?: string) => {
       headers: {
         'X-Riot-Token': process.env.RIOT_API_KEY ?? '',
       },
-      cache: 'force-cache',
     }
   );
 

@@ -1,6 +1,6 @@
 import { fetchToRiot } from '../utils';
 
-export interface ExternalMatch {
+export interface RiotMatch {
   matchId: string;
   timestamp: number;
   duration: number;
@@ -37,7 +37,7 @@ export const getRiotMatchIdList = async (
 
 export const getRiotMatchList = async (
   matchIdList: string[]
-): Promise<ExternalMatch[]> => {
+): Promise<RiotMatch[]> => {
   const response = await Promise.allSettled(
     matchIdList.map((matchId) =>
       fetchToRiot(`/lol/match/v5/matches/${matchId}`, 'asia')

@@ -54,3 +54,7 @@ select {
 .card-btn:hover {
   @apply shadow-lg shadow-gray-800 bottom-1 relative;
 }
+
+.modal-container {
+  @apply fixed top-0 left-0 right-0 z-50 w-full h-full overflow-hidden flex justify-center items-center backdrop-blur-sm;
+}

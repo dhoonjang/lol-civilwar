@@ -14,12 +14,9 @@ const UserSection = async () => {
     <>
       <UserCard user={rest} />
       <div className="mt-4 flex flex-col items-center gap-1">
-        <UpdatePoint />
-        {!!pointUpdateTime && (
-          <div className="text-sm text-stone-400 text-center">
-            마지막 업데이트 {format(pointUpdateTime, '4월 d일 HH:mm')}
-          </div>
-        )}
+        <UpdatePoint
+          pointUpdateTime={format(pointUpdateTime, '4월 d일 HH:mm')}
+        />
       </div>
     </>
   );

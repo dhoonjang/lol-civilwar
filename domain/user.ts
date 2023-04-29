@@ -41,9 +41,6 @@ export const getUserList = async () => {
         not: null,
       },
     },
-    include: {
-      comments: true,
-    },
     orderBy: {
       tier: 'desc',
     },
@@ -55,13 +52,6 @@ export const getUser = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
-    },
-    include: {
-      comments: {
-        include: {
-          writer: true,
-        },
-      },
     },
   });
 

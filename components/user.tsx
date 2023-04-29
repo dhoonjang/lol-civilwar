@@ -63,7 +63,9 @@ export const UserCard: FC<{
   );
 };
 
-export const UpdatePoint: FC = () => {
+export const UpdatePoint: FC<{ pointUpdateTime: string }> = ({
+  pointUpdateTime,
+}) => {
   const { refresh } = useRouter();
 
   const handleClick = useCallback(async () => {
@@ -81,9 +83,14 @@ export const UpdatePoint: FC = () => {
   }, [refresh]);
 
   return (
-    <button className="btn btn-blue text-sm" onClick={handleClick}>
-      포인트 업데이트
-    </button>
+    <div>
+      <button className="btn btn-blue text-sm" onClick={handleClick}>
+        포인트 업데이트
+      </button>
+      <div className="text-sm text-stone-400 text-center mt-1">
+        {pointUpdateTime}
+      </div>
+    </div>
   );
 };
 

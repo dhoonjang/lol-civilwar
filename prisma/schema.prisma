@@ -57,30 +57,27 @@ model User {
   battlePoint     Int @default(0)
   pointUpdateTime  DateTime @default(now())
 
-  comments    Comment[]
   participants Participant[]
+  externalMatchParticipants ExternalMatchParticipant[]
   bettors Bettor[]
 
   writedComments  Comment[] @relation("Writer")
 }
 
 model Comment {
-  id              String @id @default(cuid())
+  id                  String @id @default(cuid())
 
-  matchId         String
-  matchTimestamp  Int
+  matchParticipantId  String
+  writerId            String
+  comment             String
+  properTier          Int
 
-  userId          String
-  writerId        String
-  comment         String
-  properTier      Int
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   writer  User @relation("Writer", fields: [writerId], references: [id], onDelete: Cascade)
+  externalMatchParticipant ExternalMatchParticipant @relation(fields: [matchParticipantId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, matchId, writerId])
-  @@index([userId])
+  @@unique([matchParticipantId, writerId])
   @@index([writerId])
+  @@index([matchParticipantId])
 }
 
 enum CivilWarStatus {
@@ -135,4 +132,39 @@ model Participant {
   @@index([civilWarId])
   @@index([userId])
   @@index([civilWarTeamId])
+}
+
+model ExternalMatch {
+  id              String @id
+  timestamp       DateTime
+  duration        Int
+  participants    ExternalMatchParticipant[]
+
+  @@unique([id])
+}
+
+model ExternalMatchParticipant {
+  id              String @id @default(cuid())
+  win             Boolean
+  championName    String
+  puuid           String
+  summonerName    String
+  kills           Int
+  assists         Int
+  deaths          Int
+  matchId         String
+
+  match ExternalMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user  User? @relation(fields: [puuid], references: [puuid], onDelete: Cascade)
+  comments        Comment[]
+
+
+  @@index([matchId])
+  @@index([puuid])
+  @@unique([matchId, puuid])
+}
+
+model ExternalMatchUpdateTime {
+  id              String @id
+  timestamp       DateTime
 }

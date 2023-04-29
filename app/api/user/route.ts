@@ -2,19 +2,28 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchToRiot } from '@/utils/index';
 import { getMyInfo, getPuuidList } from 'domain/user';
-import { getRiotMatchIdList, getRiotMatchList } from 'domain/riot';
 
 export async function PATCH() {
   const user = await getMyInfo();
 
-  if (!user?.puuid || !prisma) return NextResponse.error();
+  if (!user?.puuid) return NextResponse.error();
 
-  const matchIdList = await getRiotMatchIdList(
-    user.puuid,
-    user.pointUpdateTime.getTime() / 1000
-  );
-
-  const matchList = await getRiotMatchList(matchIdList);
+  const matchList = await prisma.externalMatch.findMany({
+    where: {
+      participants: {
+        some: {
+          puuid: user.puuid,
+        },
+      },
+      timestamp: {
+        gt: new Date(user.pointUpdateTime),
+      },
+    },
+    include: { participants: true },
+    orderBy: {
+      timestamp: 'desc',
+    },
+  });
 
   const puuidList = await getPuuidList();
 
@@ -48,7 +57,7 @@ export async function PATCH() {
       battlePoint: {
         increment: bpIncrementPoint,
       },
-      pointUpdateTime: new Date(),
+      pointUpdateTime: matchList[0].timestamp,
     },
   });
 
@@ -59,7 +68,7 @@ export async function PUT(request: Request) {
   const data = await request.json();
   const user = await getMyInfo();
 
-  if (!user || !prisma || !data) return NextResponse.error();
+  if (!user || !data) return NextResponse.error();
 
   const riotData = await fetchToRiot(
     `/lol/summoner/v4/summoners/by-name/${data.summonerName}`
