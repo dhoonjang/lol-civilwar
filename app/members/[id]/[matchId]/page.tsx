@@ -2,12 +2,10 @@ import { CommentForm } from '@/components/match';
 import { MatchItem } from '../components';
 import { getTierInfo } from '@/utils/index';
 import { getMatch } from 'domain/match';
-import { getPuuidList, getUser } from 'domain/user';
+import { getMyInfo, getPuuidList, getUser } from 'domain/user';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { getServerSession } from 'next-auth';
-import { authOptions } from 'pages/api/auth/[...nextauth]';
 
 const MatchDetail = async ({
   params,
@@ -16,21 +14,18 @@ const MatchDetail = async ({
 }) => {
   const user = await getUser(params.id);
   const match = await getMatch(params.matchId);
-  if (!user || !match) redirect('/members');
-  const puuidList = await getPuuidList();
-
+  const me = await getMyInfo();
+  if (!user?.tier || !match || !me) redirect('/members');
   const participant = match.participants.find((m) => m.puuid === user.puuid);
+  if (!participant) redirect('/members');
 
-  if (!participant || !user.tier) return null;
-
+  const puuidList = await getPuuidList();
   const tier = getTierInfo(user.tier);
 
-  const session = await getServerSession(authOptions);
-
   const canComment =
-    participant.comments.every(
-      (c) => session && c.writerId !== session?.user.id
-    ) && user.id !== session?.user.id;
+    match.participants.some((p) => p.puuid === me.puuid) &&
+    participant.comments.every((c) => c.writerId !== me.id) &&
+    user.id !== me.id;
 
   return (
     <div className="mt-6 pb-32">
