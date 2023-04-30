@@ -164,8 +164,3 @@ model ExternalMatchParticipant {
   @@index([puuid])
   @@unique([matchId, puuid])
 }
-
-model ExternalMatchUpdateTime {
-  id              String @id
-  timestamp       DateTime
-}

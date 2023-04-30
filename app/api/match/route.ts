@@ -5,27 +5,23 @@ import { getPuuidList } from 'domain/user';
 
 export async function GET() {
   const puuidList = await getPuuidList();
-  const updateTime = await prisma.externalMatchUpdateTime.findUnique({
-    where: { id: 'global' },
-  });
+
   const currentMatchList = await prisma.externalMatch.findMany();
-  if (!updateTime) return NextResponse.error();
 
   const matchIdList = await Promise.all(
-    puuidList.map((puuid) =>
-      getRiotMatchIdList(puuid, updateTime.timestamp.getTime() / 1000)
-    )
+    puuidList.map((puuid) => getRiotMatchIdList(puuid))
   );
 
-  const matchList = await getRiotMatchList([
-    ...new Set(matchIdList.flatMap((matchIdList) => matchIdList)),
-  ]);
+  const matchList = await getRiotMatchList(
+    [...new Set(matchIdList.flatMap((matchIdList) => matchIdList))].filter(
+      (matchId) => !currentMatchList.some((cm) => cm.id === matchId)
+    )
+  );
 
   const promiseList = matchList
     .filter(
       (m) =>
-        m.participants.filter((p) => puuidList.includes(p.puuid)).length >= 2 &&
-        !currentMatchList.some((cm) => cm.id === m.matchId)
+        m.participants.filter((p) => puuidList.includes(p.puuid)).length >= 2
     )
     .map((match) =>
       prisma.externalMatch.create({
@@ -50,13 +46,7 @@ export async function GET() {
       })
     );
 
-  const result = await prisma.$transaction([
-    ...promiseList,
-    prisma.externalMatchUpdateTime.update({
-      where: { id: 'global' },
-      data: { timestamp: new Date(matchList[0].timestamp) },
-    }),
-  ]);
+  const result = await prisma.$transaction(promiseList);
 
   return NextResponse.json(result);
 }
