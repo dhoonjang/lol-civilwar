@@ -27,6 +27,8 @@ export async function PATCH() {
 
   const puuidList = await getPuuidList();
 
+  if (matchList.length === 0) return NextResponse.json(user);
+
   const [rpIncrementPoint, bpIncrementPoint] = matchList.reduce<
     [number, number]
   >(
