@@ -59,6 +59,23 @@ export const getUser = async (userId: string) => {
   return null;
 };
 
+export const getUserPariticipants = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      externalMatchParticipants: {
+        include: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  return user;
+};
+
 export const getPuuidList = async (): Promise<string[]> => {
   const puuidList = await prisma.user.findMany({
     where: {

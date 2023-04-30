@@ -26,6 +26,7 @@ select {
 
 .btn {
   @apply font-bold h-10 px-4 rounded transition-all;
+  line-height: 40px;
 }
 .btn-blue {
   @apply bg-slate-800 text-white;
