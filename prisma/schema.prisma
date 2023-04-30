@@ -71,6 +71,7 @@ model Comment {
   writerId            String
   comment             String
   properTier          Int
+  createdAt           DateTime @default(now())
 
   writer  User @relation("Writer", fields: [writerId], references: [id], onDelete: Cascade)
   externalMatchParticipant ExternalMatchParticipant @relation(fields: [matchParticipantId], references: [id], onDelete: Cascade)

@@ -1,9 +1,15 @@
-import { MatchItem } from '@/components/match';
+import { CommentForm } from '@/components/match';
+import { MatchItem } from '../components';
+import { getTierInfo } from '@/utils/index';
 import { getMatch } from 'domain/match';
 import { getPuuidList, getUser } from 'domain/user';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
+import { format } from 'date-fns';
+import { getServerSession } from 'next-auth';
+import { authOptions } from 'pages/api/auth/[...nextauth]';
 
-const MatchList = async ({
+const MatchDetail = async ({
   params,
 }: {
   params: { id: string; matchId: string };
@@ -15,6 +21,17 @@ const MatchList = async ({
 
   const participant = match.participants.find((m) => m.puuid === user.puuid);
 
+  if (!participant || !user.tier) return null;
+
+  const tier = getTierInfo(user.tier);
+
+  const session = await getServerSession(authOptions);
+
+  const canComment =
+    participant.comments.every(
+      (c) => session && c.writerId !== session?.user.id
+    ) && user.id !== session?.user.id;
+
   return (
     <div className="mt-6 pb-32">
       <MatchItem
@@ -23,52 +40,41 @@ const MatchList = async ({
         userPuuid={String(user.puuid)}
         puuidList={puuidList}
       />
-      <form className="card mt-4">
-        <input
-          type="text"
-          placeholder="경기에 대한 한줄평을 입력하세요"
-          className="w-full mb-4 border rounded-lg border-gray-500"
+      {canComment && (
+        <CommentForm
+          tier={Math.floor(user.tier / 20) * 20 + 10}
+          tierNumber={tier.tierNumber}
+          matchParticipantId={participant.id}
         />
-        <div className="flex justify-between">
-          <div className="flex items-center">
-            적정 티어
-            <select
-              id="tier"
-              className="w-28 h-8 border rounded-lg mr-2 ml-4 border-gray-500 text-center"
-            >
-              <option value={10}>아이언</option>
-              <option value={30}>브론즈</option>
-              <option value={50}>실버</option>
-              <option value={70}>골드</option>
-              <option value={90}>플래티넘</option>
-              <option value={110}>다이아</option>
-              <option value={130}>마스터</option>
-            </select>
-            <select
-              id="tierNumber"
-              className="w-16 h-8 border rounded-lg font-roman border-gray-500 text-center"
-            >
-              <option value={4}>4</option>
-              <option value={3}>3</option>
-              <option value={2}>2</option>
-              <option value={1}>1</option>
-            </select>
-          </div>
-          <button className="btn btn-blue" type="submit">
-            댓글 작성
-          </button>
-        </div>
-      </form>
-      <div className="flex flex-col">
-        {participant &&
-          participant.comments.map((c) => (
-            <div key={c.id} className="box">
-              {c.comment}
+      )}
+      <div className="flex flex-col mt-2 gap-2">
+        {participant.comments.map((c) => {
+          const tierInfo = getTierInfo(c.properTier);
+
+          return (
+            <div key={c.id} className="card flex items-center justify-between">
+              <div className="flex items-center">
+                <div>
+                  <Image
+                    src={tierInfo.tierImage}
+                    alt={tierInfo.tierName}
+                    className="w-12 h-12"
+                  />
+                  <p className="text-center font-roman text-sm">
+                    {tierInfo.tierNumber}
+                  </p>
+                </div>
+                <div className="ml-5">{c.comment}</div>
+              </div>
+              <div className="text-stone-400">
+                {format(c.createdAt, 'yyyy-MM-dd HH:mm')}
+              </div>
             </div>
-          ))}
+          );
+        })}
       </div>
     </div>
   );
 };
 
-export default MatchList;
+export default MatchDetail;

@@ -1,4 +1,4 @@
-import { MatchItem } from '@/components/match';
+import { MatchItem } from './components';
 import { getMatchList } from 'domain/match';
 import { getPuuidList, getUser } from 'domain/user';
 import { redirect } from 'next/navigation';

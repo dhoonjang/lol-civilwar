@@ -1,102 +1,88 @@
-import { ExternalMatchParticipant, ExternalMatch, User } from '@prisma/client';
-import { format } from 'date-fns';
-import Link from 'next/link';
-import { memo } from 'react';
+'use client';
 
-export const ParticipantView = memo(
-  ({
-    summonerName,
-    kills,
-    deaths,
-    assists,
-    borderd,
-    championName,
-    highlighted,
-    win,
-  }: ExternalMatchParticipant & {
-    borderd: boolean;
-    highlighted: boolean;
-  }) => {
-    return (
-      <div
-        className={`flex gap-2 rounded items-center p-1 px-2 ${
-          highlighted ? 'bg-black/50' : ''
-        } ${borderd ? 'border border-stone-300' : ''} ${
-          win ? 'flex-row' : 'flex-row-reverse'
-        }`}
-      >
-        <div className="text-bold">{summonerName}</div>
-        <div className="text-sm text-bold">[{championName}]</div>
-        <div className="text-sm text-stone-300">
-          {kills} / {deaths} / {assists}
-        </div>
-      </div>
-    );
-  }
-);
+import { Comment, ExternalMatchParticipant } from '@prisma/client';
+import { useRouter } from 'next/navigation';
+import { FormEvent, startTransition, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
 
-ParticipantView.displayName = 'ParticipantView';
-
-interface MatchItemProps {
-  match: ExternalMatch & {
-    participants: ExternalMatchParticipant[];
-  };
-  userId?: string;
-  userPuuid: string;
-  puuidList: string[];
+interface CommentFormProps {
+  tier: number;
+  tierNumber: number;
+  matchParticipantId: string;
 }
 
-export const MatchItem = memo(
-  ({ match, userId, userPuuid, puuidList }: MatchItemProps) => {
-    const win =
-      match.participants.find((p) => p.puuid === userPuuid)?.win ?? false;
+export const CommentForm = ({
+  tier,
+  tierNumber,
+  matchParticipantId,
+}: CommentFormProps) => {
+  const { refresh } = useRouter();
 
-    return (
-      <div
-        className={`rounded-xl p-3 flex justify-between items-center ${
-          win ? 'bg-slate-800' : 'bg-red-900'
-        }`}
-      >
-        <div className="text-left w-2/5">
-          {match.participants
-            .filter((p) => p.win)
-            .map((p) => (
-              <ParticipantView
-                {...p}
-                key={p.puuid}
-                borderd={puuidList.includes(p.puuid)}
-                highlighted={p.puuid === userPuuid}
-              />
-            ))}
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const properTier =
+        Number(e.currentTarget.tier.value) +
+        (5 - Number(e.currentTarget.tierNumber.value)) * 5 -
+        13;
+
+      const response = await fetch('/api/comment', {
+        method: 'POST',
+        body: JSON.stringify({
+          matchParticipantId,
+          comment: e.currentTarget.comment.value,
+          properTier,
+        }),
+      });
+      const comment: Comment = await response.json();
+
+      if (!!comment) toast.success(`댓글이 등록되었습니다.`);
+
+      startTransition(refresh);
+    },
+    [refresh, matchParticipantId]
+  );
+
+  return (
+    <form className="card mt-4" onSubmit={handleSubmit}>
+      <input
+        id="comment"
+        type="text"
+        placeholder="경기에 대한 한줄평을 입력하세요"
+        className="w-full mb-4 border rounded-lg border-gray-500"
+      />
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          적정 티어
+          <select
+            id="tier"
+            className="w-28 h-8 border rounded-lg mr-2 ml-4 border-gray-500 text-center"
+            defaultValue={tier}
+          >
+            <option value={10}>아이언</option>
+            <option value={30}>브론즈</option>
+            <option value={50}>실버</option>
+            <option value={70}>골드</option>
+            <option value={90}>플래티넘</option>
+            <option value={110}>다이아</option>
+            <option value={130}>마스터</option>
+          </select>
+          <select
+            id="tierNumber"
+            className="w-16 h-8 border rounded-lg font-roman border-gray-500 text-center"
+            defaultValue={tierNumber}
+          >
+            <option value={4}>4</option>
+            <option value={3}>3</option>
+            <option value={2}>2</option>
+            <option value={1}>1</option>
+          </select>
         </div>
-        <div className="text-center">
-          {format(match.timestamp, 'M월 d일 HH:mm')}
-          <div className="mt-1">
-            {Math.floor(match.duration / 60)}분 {match.duration % 60}초
-          </div>
-          {userId && (
-            <div className="mt-3 gap-1 flex flex-col">
-              <Link href={`/members/${userId}/${match.id}`}>
-                <button className="btn btn-black text-sm">자세히 보기</button>
-              </Link>
-            </div>
-          )}
-        </div>
-        <div className="text-right w-2/5">
-          {match.participants
-            .filter((p) => !p.win)
-            .map((p) => (
-              <ParticipantView
-                {...p}
-                key={p.puuid}
-                borderd={puuidList.includes(p.puuid)}
-                highlighted={p.puuid === userPuuid}
-              />
-            ))}
-        </div>
+        <button className="btn btn-blue" type="submit">
+          댓글 작성
+        </button>
       </div>
-    );
-  }
-);
-
-MatchItem.displayName = 'MatchItem';
+    </form>
+  );
+};
