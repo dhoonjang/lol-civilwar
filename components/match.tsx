@@ -24,7 +24,11 @@ export const CommentForm = ({
 }: CommentFormProps) => {
   const { refresh } = useRouter();
 
-  const { mutate } = useMutation<Comment, unknown, CreateCommentRequest>(
+  const { mutate, isLoading } = useMutation<
+    Comment,
+    unknown,
+    CreateCommentRequest
+  >(
     async (data) => {
       const { comment, properTier } = data;
 
@@ -98,7 +102,7 @@ export const CommentForm = ({
             <option value={1}>1</option>
           </select>
         </div>
-        <button className="btn btn-blue" type="submit">
+        <button className="btn btn-blue" disabled={isLoading} type="submit">
           댓글 작성
         </button>
       </div>
