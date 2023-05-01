@@ -2,7 +2,6 @@ import { getRiotMatchIdList, getRiotMatchList } from 'domain/riot';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getPuuidList } from 'domain/user';
-import { User } from '@prisma/client';
 import { calculateTeamDifference } from '@/utils/index';
 
 export async function GET() {

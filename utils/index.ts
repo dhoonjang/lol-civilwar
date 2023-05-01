@@ -160,7 +160,7 @@ export function calculateTeamDifference(userList: User[]) {
     ...new Set(team1.map((user) => user.position).filter((p) => p !== null)),
   ];
 
-  const team2SubPositionList = team1
+  const team2SubPositionList = team2
     .map((user) => user.subPosition)
     .filter((p) => p !== null && !team2PositionList.includes(p));
 
@@ -176,6 +176,6 @@ export function calculateTeamDifference(userList: User[]) {
 
   let result = Math.abs(team1Point - team2Point);
 
-  if (team1PositionArrange > 4 && team2PositionArrange > 4) result -= 10;
+  if (team1PositionArrange > 4 && team2PositionArrange > 4) result -= 20;
   return result;
 }
