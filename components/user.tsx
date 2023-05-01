@@ -69,23 +69,34 @@ export const UpdatePoint: FC<{ pointUpdateTime: string }> = ({
 }) => {
   const { refresh } = useRouter();
 
-  const handleClick = useCallback(async () => {
-    const response = await fetch('/api/user', {
-      method: 'PATCH',
-    });
-    const user: User = await response.json();
+  const { mutate, isLoading } = useMutation<User>(
+    async () => {
+      const response = await fetch('/api/user', {
+        method: 'PATCH',
+      });
+      const user: User = await response.json();
 
-    toast.success(
-      `포인트 업데이트가 완료되었습니다.
-[RP: ${user.relationPoint} / BP: ${user.battlePoint}]`
-    );
+      return user;
+    },
+    {
+      onSuccess: (user) => {
+        toast.success(
+          `포인트 업데이트가 완료되었습니다.
+  [RP: ${user.relationPoint} / BP: ${user.battlePoint}]`
+        );
 
-    startTransition(refresh);
-  }, [refresh]);
+        startTransition(refresh);
+      },
+    }
+  );
 
   return (
     <div>
-      <button className="btn btn-blue text-sm" onClick={handleClick}>
+      <button
+        className="btn btn-blue text-sm"
+        disabled={isLoading}
+        onClick={() => mutate()}
+      >
         포인트 업데이트
       </button>
       <div className="text-sm text-stone-400 text-center mt-1">
@@ -107,7 +118,11 @@ export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
 }) => {
   const [mainPosition, setMainPosition] = useState('null');
 
-  const { mutate } = useMutation<User, unknown, CreateSummonerRequest>(
+  const { mutate, isLoading } = useMutation<
+    User,
+    unknown,
+    CreateSummonerRequest
+  >(
     async (data) => {
       const { summonerName, tier, position, subPosition } = data;
       const response = await fetch('/api/user', {
@@ -191,7 +206,7 @@ export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
             ))}
         </select>
       )}
-      <button className="btn btn-blue w-64" type="submit">
+      <button className="btn btn-blue w-64" disabled={isLoading} type="submit">
         소환사 등록
       </button>
     </form>

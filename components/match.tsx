@@ -1,6 +1,7 @@
 'use client';
 
 import { Comment } from '@prisma/client';
+import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { FormEvent, startTransition, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
@@ -11,12 +12,39 @@ interface CommentFormProps {
   participantId: string;
 }
 
+interface CreateCommentRequest {
+  properTier: number;
+  comment: string;
+}
+
 export const CommentForm = ({
   tier,
   tierNumber,
   participantId,
 }: CommentFormProps) => {
   const { refresh } = useRouter();
+
+  const { mutate } = useMutation<Comment, unknown, CreateCommentRequest>(
+    async (data) => {
+      const { comment, properTier } = data;
+
+      const response = await fetch('/api/comment', {
+        method: 'POST',
+        body: JSON.stringify({
+          participantId,
+          comment,
+          properTier,
+        }),
+      });
+      return await response.json();
+    },
+    {
+      onSuccess: () => {
+        toast.success(`댓글이 등록되었습니다.`);
+        startTransition(refresh);
+      },
+    }
+  );
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -27,21 +55,12 @@ export const CommentForm = ({
         (5 - Number(e.currentTarget.tierNumber.value)) * 5 -
         13;
 
-      const response = await fetch('/api/comment', {
-        method: 'POST',
-        body: JSON.stringify({
-          participantId,
-          comment: e.currentTarget.comment.value,
-          properTier,
-        }),
+      mutate({
+        properTier,
+        comment: e.currentTarget.comment.value,
       });
-      const comment: Comment = await response.json();
-
-      if (!!comment) toast.success(`댓글이 등록되었습니다.`);
-
-      startTransition(refresh);
     },
-    [refresh, participantId]
+    [mutate]
   );
 
   return (
