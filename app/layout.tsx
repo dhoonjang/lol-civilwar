@@ -1,7 +1,7 @@
 // These styles apply to every route in the application
 import '@/styles/globals.css';
 import localFont from 'next/font/local';
-import Toaster from '@/components/toaster';
+import { Provider, Toaster } from '@/components/root';
 
 const roman = localFont({
   variable: '--font-roman',
@@ -21,7 +21,7 @@ export default async function RootLayout({
     <html lang="ko">
       <body className={`${roman.variable}`}>
         <Toaster />
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
