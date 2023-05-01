@@ -144,7 +144,7 @@ export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
         summonerName: e.currentTarget.summonerName.value,
         tier: Number(e.currentTarget.tier.value),
         position: e.currentTarget.position.value,
-        subPosition: e.currentTarget.subPosition.value,
+        subPosition: e.currentTarget.subPosition?.value,
       });
     },
     [mutate]
