@@ -1,6 +1,6 @@
 'use client';
 
-import { Comment, ExternalMatchParticipant } from '@prisma/client';
+import { Comment } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { FormEvent, startTransition, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
@@ -8,13 +8,13 @@ import { toast } from 'react-hot-toast';
 interface CommentFormProps {
   tier: number;
   tierNumber: number;
-  matchParticipantId: string;
+  participantId: string;
 }
 
 export const CommentForm = ({
   tier,
   tierNumber,
-  matchParticipantId,
+  participantId,
 }: CommentFormProps) => {
   const { refresh } = useRouter();
 
@@ -30,7 +30,7 @@ export const CommentForm = ({
       const response = await fetch('/api/comment', {
         method: 'POST',
         body: JSON.stringify({
-          matchParticipantId,
+          participantId,
           comment: e.currentTarget.comment.value,
           properTier,
         }),
@@ -41,7 +41,7 @@ export const CommentForm = ({
 
       startTransition(refresh);
     },
-    [refresh, matchParticipantId]
+    [refresh, participantId]
   );
 
   return (

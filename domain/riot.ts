@@ -54,7 +54,7 @@ export const getRiotMatchList = async (
   return matchList
     .map((m) => ({
       matchId: m.metadata.matchId,
-      timestamp: m.info.gameEndTimestamp,
+      timestamp: m.info.gameStartTimestamp,
       duration: m.info.gameDuration,
       participants: m.info.participants.map(
         ({

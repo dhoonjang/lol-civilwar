@@ -8,20 +8,26 @@ export async function PATCH() {
 
   if (!user?.puuid) return NextResponse.error();
 
-  const matchList = await prisma.externalMatch.findMany({
+  const matchList = await prisma.match.findMany({
     where: {
       participants: {
         some: {
           puuid: user.puuid,
         },
       },
-      timestamp: {
+      updatedAt: {
         gt: new Date(user.pointUpdateTime),
       },
+      OR: [
+        {
+          status: { equals: 'EXTERNAL' },
+        },
+        { status: { equals: 'END' } },
+      ],
     },
     include: { participants: true },
     orderBy: {
-      timestamp: 'desc',
+      updatedAt: 'desc',
     },
   });
 
@@ -59,7 +65,7 @@ export async function PATCH() {
       battlePoint: {
         increment: bpIncrementPoint,
       },
-      pointUpdateTime: matchList[0].timestamp,
+      pointUpdateTime: matchList[0].updatedAt,
     },
   });
 

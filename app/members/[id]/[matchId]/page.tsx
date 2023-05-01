@@ -39,7 +39,7 @@ const MatchDetail = async ({
         <CommentForm
           tier={Math.floor(user.tier / 20) * 20 + 10}
           tierNumber={tier.tierNumber}
-          matchParticipantId={participant.id}
+          participantId={participant.id}
         />
       )}
       <div className="flex flex-col mt-2 gap-2">

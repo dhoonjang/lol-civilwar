@@ -8,9 +8,9 @@ export async function POST(request: Request) {
 
   if (!user?.tier || !data) return NextResponse.error();
 
-  const participant = await prisma.externalMatchParticipant.findUnique({
+  const participant = await prisma.participant.findUnique({
     where: {
-      id: data.matchParticipantId,
+      id: data.participantId,
     },
   });
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         writerId: user.id,
         comment: data.comment,
         properTier: data.properTier,
-        matchParticipantId: participant.id,
+        participantId: participant.id,
       },
     }),
     prisma.user.update({

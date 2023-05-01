@@ -10,7 +10,7 @@ const MatchList = async ({ params }: { params: { id: string } }) => {
 
   if (!user) redirect('/members');
 
-  const comments = user.externalMatchParticipants.flatMap((m) =>
+  const comments = user.participants.flatMap((m) =>
     m.comments.map((c) => ({ ...c, matchId: m.matchId }))
   );
 

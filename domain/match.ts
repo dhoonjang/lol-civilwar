@@ -1,13 +1,25 @@
 import prisma from '@/lib/prisma';
 
-export const getMatchList = async (puuid: string) =>
-  await prisma.externalMatch.findMany({
+export const getMatchList = async (puuid: string) => {
+  const matchList = await prisma.match.findMany({
     where: {
       participants: {
         some: {
           puuid,
         },
       },
+      OR: [
+        {
+          status: {
+            equals: 'EXTERNAL',
+          },
+        },
+        {
+          status: {
+            equals: 'END',
+          },
+        },
+      ],
     },
     include: {
       participants: true,
@@ -17,8 +29,11 @@ export const getMatchList = async (puuid: string) =>
     },
   });
 
+  return matchList;
+};
+
 export const getMatch = async (matchId: string) => {
-  const match = await prisma.externalMatch.findUnique({
+  const match = await prisma.match.findUnique({
     where: {
       id: matchId,
     },
@@ -31,6 +46,5 @@ export const getMatch = async (matchId: string) => {
     },
   });
 
-  if (!match) return null;
   return match;
 };

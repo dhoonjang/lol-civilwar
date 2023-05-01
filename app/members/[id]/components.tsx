@@ -1,4 +1,4 @@
-import { ExternalMatchParticipant, ExternalMatch } from '@prisma/client';
+import { Match, Participant } from '@prisma/client';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { memo } from 'react';
@@ -13,7 +13,7 @@ export const ParticipantView = memo(
     championName,
     highlighted,
     win,
-  }: ExternalMatchParticipant & {
+  }: Participant & {
     borderd: boolean;
     highlighted: boolean;
   }) => {
@@ -38,8 +38,8 @@ export const ParticipantView = memo(
 ParticipantView.displayName = 'ParticipantView';
 
 interface MatchItemProps {
-  match: ExternalMatch & {
-    participants: ExternalMatchParticipant[];
+  match: Match & {
+    participants: Participant[];
   };
   userId?: string;
   userPuuid: string;
@@ -70,10 +70,12 @@ export const MatchItem = memo(
             ))}
         </div>
         <div className="text-center">
-          {format(match.timestamp, 'M월 d일 HH:mm')}
-          <div className="mt-1">
-            {Math.floor(match.duration / 60)}분 {match.duration % 60}초
-          </div>
+          {format(match.timestamp || match.createdAt, 'M월 d일 HH:mm')}
+          {match.duration && (
+            <div className="mt-1">
+              {Math.floor(match.duration / 60)}분 {match.duration % 60}초
+            </div>
+          )}
           {userId && (
             <div className="mt-3 gap-1 flex flex-col">
               <Link href={`/members/${userId}/${match.id}`}>

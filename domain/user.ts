@@ -65,7 +65,7 @@ export const getUserPariticipants = async (userId: string) => {
       id: userId,
     },
     include: {
-      externalMatchParticipants: {
+      participants: {
         include: {
           comments: true,
         },
