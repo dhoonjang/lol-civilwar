@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchToRiot } from '@/utils/index';
 import { getMyInfo, getPuuidList } from 'domain/user';
+import { CreateSummonerRequest } from '@/components/user';
 
 export async function PATCH() {
   const user = await getMyInfo();
@@ -101,7 +102,7 @@ export async function PUT(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  const data: CreateSummonerRequest = await request.json();
 
   if (!prisma || !data) return NextResponse.error();
 

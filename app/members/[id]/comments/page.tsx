@@ -10,9 +10,9 @@ const MatchList = async ({ params }: { params: { id: string } }) => {
 
   if (!user) redirect('/members');
 
-  const comments = user.participants.flatMap((m) =>
-    m.comments.map((c) => ({ ...c, matchId: m.matchId }))
-  );
+  const comments = user.participants
+    .flatMap((m) => m.comments.map((c) => ({ ...c, matchId: m.matchId })))
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   return (
     <div className="flex flex-col mt-6 gap-2">

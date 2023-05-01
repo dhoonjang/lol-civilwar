@@ -79,7 +79,7 @@ export const MatchItem = memo(
           {userId && (
             <div className="mt-3 gap-1 flex flex-col">
               <Link href={`/members/${userId}/${match.id}`}>
-                <button className="btn btn-black text-sm">자세히 보기</button>
+                <button className="btn btn-black text-sm">한줄평 보기</button>
               </Link>
             </div>
           )}

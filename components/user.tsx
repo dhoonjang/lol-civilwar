@@ -1,10 +1,11 @@
 'use client';
-import { User } from '@prisma/client';
+import { Position, User } from '@prisma/client';
 import { FC, FormEvent, startTransition, useCallback, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { getTierInfo, positionOptions } from 'utils';
 import Image from 'next/image';
+import { useMutation } from '@tanstack/react-query';
 
 export const UserCard: FC<{
   className?: string;
@@ -94,35 +95,59 @@ export const UpdatePoint: FC<{ pointUpdateTime: string }> = ({
   );
 };
 
+export interface CreateSummonerRequest {
+  summonerName: string;
+  tier: number;
+  position: Position | 'null';
+  subPosition: Position | 'null';
+}
+
 export const RegisterSummoner: FC<{ createMode?: boolean }> = ({
   createMode,
 }) => {
   const [mainPosition, setMainPosition] = useState('null');
+
+  const { mutate } = useMutation<User, unknown, CreateSummonerRequest>(
+    async (data) => {
+      const { summonerName, tier, position, subPosition } = data;
+      const response = await fetch('/api/user', {
+        method: createMode ? 'POST' : 'PUT',
+        body: JSON.stringify({
+          summonerName,
+          tier,
+          position,
+          subPosition,
+        }),
+      });
+      const user: User = await response.json();
+
+      return user;
+    },
+    {
+      onSuccess: (user) => {
+        toast.success(
+          `소환사 정보가 등록되었습니다.
+[소환사 이름: ${user.summonerName}]`
+        );
+
+        startTransition(refresh);
+      },
+    }
+  );
   const { refresh } = useRouter();
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      const response = await fetch('/api/user', {
-        method: createMode ? 'POST' : 'PUT',
-        body: JSON.stringify({
-          summonerName: e.currentTarget.summonerName.value,
-          tier: e.currentTarget.tier.value,
-          position: e.currentTarget.position.value,
-          subPosition: e.currentTarget.subPosition?.value,
-        }),
+      mutate({
+        summonerName: e.currentTarget.summonerName.value,
+        tier: Number(e.currentTarget.tier.value),
+        position: e.currentTarget.position.value,
+        subPosition: e.currentTarget.subPosition.value,
       });
-      const user: User = await response.json();
-
-      toast.success(
-        `소환사 정보가 등록되었습니다.
-[소환사 이름: ${user.summonerName}]`
-      );
-
-      startTransition(refresh);
     },
-    [refresh, createMode]
+    [mutate]
   );
 
   return (
