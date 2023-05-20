@@ -13,7 +13,6 @@ import jungleImage from '@/assets/jungle.svg';
 import midImage from '@/assets/mid.svg';
 import adcImage from '@/assets/adc.svg';
 import supportImage from '@/assets/support.svg';
-import { User } from '@prisma/client';
 
 export const positionOptions = [
   {
@@ -134,48 +133,4 @@ export function exclude<T, Key extends keyof T>(
     delete user[key];
   }
   return user;
-}
-
-export function calculateTeamDifference(userList: User[]) {
-  const team1 = userList.filter((_, index) => index % 2 === 0);
-  const team2 = userList.filter((_, index) => index % 2 === 1);
-
-  const team1TotalTier = team1.reduce((acc, cur) => acc + (cur.tier || 0), 0);
-  const team2TotalTier = team2.reduce((acc, cur) => acc + (cur.tier || 0), 0);
-
-  const team1PositionList = [
-    ...new Set(team1.map((user) => user.position).filter((p) => p !== null)),
-  ];
-
-  const team1SubPositionList = team1
-    .map((user) => user.subPosition)
-    .filter((p) => p !== null && !team1PositionList.includes(p));
-
-  const team1PositionArrange =
-    team1PositionList.length +
-    team1SubPositionList.length * 0.5 +
-    team1.filter((user) => user.position === null).length;
-
-  const team2PositionList = [
-    ...new Set(team1.map((user) => user.position).filter((p) => p !== null)),
-  ];
-
-  const team2SubPositionList = team2
-    .map((user) => user.subPosition)
-    .filter((p) => p !== null && !team2PositionList.includes(p));
-
-  const team2PositionArrange =
-    team2PositionList.length +
-    team2SubPositionList.length * 0.5 +
-    team2.filter((user) => user.position === null).length;
-
-  if (team1PositionArrange <= 3 || team2PositionArrange <= 3) return 1000;
-
-  const team1Point = team1TotalTier + team1PositionArrange * 20;
-  const team2Point = team2TotalTier + team2PositionArrange * 20;
-
-  let result = Math.abs(team1Point - team2Point);
-
-  if (team1PositionArrange > 4 && team2PositionArrange > 4) result -= 20;
-  return result;
 }

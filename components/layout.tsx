@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from '@prisma/client';
+import { Member, Summoner } from '@prisma/client';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ export const Navigation = () => {
   );
 };
 
-export const ProfileIcon: FC<Omit<User, 'pointUpdateTime'>> = ({ image }) => {
+export const ProfileIcon: FC<Member> = ({ image }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
 

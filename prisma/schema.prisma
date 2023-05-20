@@ -11,31 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-enum Position {
-  TOP
-  JUNGLE
-  MID
-  ADC
-  SUPPORT
-}
-
-model Summoner {
-  id              String @id @default(cuid())
-
-  discordId       String @unique
-
-  name            String
-  puuid           String @unique
-
-  position        Position
-
-  members         Member[]
-  participants    Participant[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
 model Guild {
   id          String @id
   name        String
@@ -55,6 +30,7 @@ enum Permission {
 model Member {
   id            String @id
 
+  image         String
   permission    Permission
   guildId       String
   summonerId    String
@@ -64,6 +40,33 @@ model Member {
 
   @@unique([guildId, summonerId])
   @@index([guildId])
+  @@index([summonerId])
+}
+
+
+model Summoner {
+  id              String @id @default(cuid())
+  discordId       String @unique
+
+  name            String
+
+  tier            Int
+  position        String
+
+  riotAccounts    RiotAccount[]
+  members         Member[]
+  participants    Participant[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model RiotAccount {
+  puuid       String @id
+  summonerId  String
+
+  summoner    Summoner @relation(fields: [summonerId], references: [id], onDelete: Cascade)
+
   @@index([summonerId])
 }
 
@@ -89,7 +92,7 @@ model Match {
 
 model Participant {
   id              String @id @default(cuid())
-  puuid           String
+  summonerId           String
   matchId         String
 
   win             Boolean?
@@ -100,9 +103,9 @@ model Participant {
   deaths          Int?
 
   match           Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  summoner        Summoner? @relation(fields: [puuid], references: [puuid], onDelete: Cascade)
+  summoner        Summoner? @relation(fields: [summonerId], references: [id], onDelete: Cascade)
 
-  @@unique([matchId, puuid])
+  @@unique([matchId, summonerId])
   @@index([matchId])
-  @@index([puuid])
+  @@index([summonerId])
 }
