@@ -13,13 +13,19 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    session: ({ session, token }) => {
-      if (session.user) {
-        session.user.id = token.sub;
+    jwt: async ({ token, account }) => {
+      if (account) {
+        token.accessToken = account.access_token;
       }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (session.user) session.user.id = token.sub;
       return session;
     },
   },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

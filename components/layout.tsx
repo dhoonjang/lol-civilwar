@@ -1,7 +1,8 @@
 'use client';
 
 import { Member, Summoner } from '@prisma/client';
-import { signOut } from 'next-auth/react';
+import { getToken } from 'next-auth/jwt';
+import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -87,5 +88,13 @@ export const ProfileIcon: FC<Member> = ({ image }) => {
         </div>
       )}
     </div>
+  );
+};
+
+export const SignInButton = () => {
+  return (
+    <button className="btn" onClick={() => signIn()}>
+      로그인
+    </button>
   );
 };
