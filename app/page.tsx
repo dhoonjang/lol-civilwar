@@ -32,9 +32,6 @@ const Home = async () => {
         alt="Platforms on Vercel"
         className="w-40 h-40"
       />
-      <h1 className="font-bold text-2xl text-center mb-10">
-        제 2회 찌질이들의 롤대회
-      </h1>
       <Suspense>
         {/* @ts-expect-error Server Component */}
         <UserSection />

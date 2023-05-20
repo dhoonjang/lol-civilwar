@@ -11,26 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
 enum Position {
   TOP
   JUNGLE
@@ -39,48 +19,55 @@ enum Position {
   SUPPORT
 }
 
-model User {
-  id              String    @id @default(cuid())
-  name            String?
-  email           String?   @unique
-  emailVerified   Boolean?
-  image           String?
-  accounts        Account[]
+model Summoner {
+  id              String @id @default(cuid())
 
-  summonerName    String?   @unique
-  puuid           String?   @unique
-  tier            Int?
-  position        Position?
-  subPosition     Position?
+  discordId       String @unique
 
-  relationPoint   Int @default(0)
-  battlePoint     Int @default(0)
-  pointUpdateTime DateTime @default(now())
+  name            String
+  puuid           String @unique
 
+  position        Position
+
+  members         Member[]
   participants    Participant[]
-  bettors         Bettor[]
-  writedComments  Comment[] @relation("Writer")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
-model Comment {
-  id             String @id @default(cuid())
+model Guild {
+  id          String @id
+  name        String
 
-  participantId  String
-  writerId       String
-  comment        String
-  properTier     Int
-  createdAt      DateTime @default(now())
+  members     Member[]
 
-  writer         User @relation("Writer", fields: [writerId], references: [id], onDelete: Cascade)
-  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-  @@unique([participantId, writerId])
-  @@index([writerId])
-  @@index([participantId])
+enum Permission {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Member {
+  id            String @id
+
+  permission    Permission
+  guildId       String
+  summonerId    String
+
+  guild         Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  summoner      Summoner @relation(fields: [summonerId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, summonerId])
+  @@index([guildId])
+  @@index([summonerId])
 }
 
 enum MatchStatus {
-  EXTERNAL
   BATTING
   STARTED
   END
@@ -96,30 +83,8 @@ model Match {
   duration        Int?
 
   participants    Participant[]
-  bettors         Bettor[]
 
   @@unique([id])
-}
-
-enum TeamType {
-  RED
-  BLUE
-}
-
-model Bettor {
-  id             String @id @default(cuid())
-  userId         String
-  matchId        String
-
-  batTeam        TeamType
-  batPoint       Int
-
-  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  match          Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-
-  @@unique([matchId, userId])
-  @@index([userId])
-  @@index([matchId])
 }
 
 model Participant {
@@ -127,7 +92,6 @@ model Participant {
   puuid           String
   matchId         String
 
-  team            TeamType?
   win             Boolean?
   championName    String?
   summonerName    String?
@@ -136,8 +100,7 @@ model Participant {
   deaths          Int?
 
   match           Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  user            User? @relation(fields: [puuid], references: [puuid], onDelete: Cascade)
-  comments        Comment[]
+  summoner        Summoner? @relation(fields: [puuid], references: [puuid], onDelete: Cascade)
 
   @@unique([matchId, puuid])
   @@index([matchId])
