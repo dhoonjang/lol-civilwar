@@ -4,7 +4,7 @@ import nextAuthMiddleware, { WithAuthArgs } from 'next-auth/middleware';
 import { NextRequest } from 'next/server';
 
 export const config = {
-  matcher: ['/api/interactions', '/guilds/:path*'],
+  matcher: ['/api/interactions', '/guilds/:path*', '/summoners/:path*'],
 };
 
 async function getRawbody(readable: ReadableStream<Uint8Array> | null) {

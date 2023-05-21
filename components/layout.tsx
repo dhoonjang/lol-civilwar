@@ -1,7 +1,6 @@
 'use client';
 
-import { Member, Summoner } from '@prisma/client';
-import { getToken } from 'next-auth/jwt';
+import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,7 +36,7 @@ export const Navigation = () => {
   );
 };
 
-export const ProfileIcon: FC<Member> = ({ image }) => {
+export const ProfileIcon: FC<Session['user']> = ({ image }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
 

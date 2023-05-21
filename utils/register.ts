@@ -1,4 +1,4 @@
-import { Member, Permission, Summoner } from '@prisma/client';
+import { Guild, Member, Permission, Summoner } from '@prisma/client';
 import { fetchToDiscord, fetchToRiot } from './api';
 import prisma from './prisma';
 
@@ -36,22 +36,12 @@ export const registerSummoner = async (discordId: string, name: string) => {
 };
 
 export const registerMember = async (
-  guildId: string,
+  serverId: string,
   summonerId: string
-): Promise<
-  [
-    (
-      | (Member & {
-          summoner: Summoner;
-        })
-      | null
-    ),
-    boolean
-  ]
-> => {
+): Promise<[(Member & { summoner: Summoner }) | null, Guild | null]> => {
   const existGuild = await prisma.guild.findUnique({
     where: {
-      id: guildId,
+      serverId,
     },
   });
 
@@ -67,18 +57,18 @@ export const registerMember = async (
       },
     });
 
-    return [member, false];
+    return [member, null];
   }
 
-  const dicordGuild = await fetchToDiscord(`/guilds/${guildId}/preview`);
+  const dicordGuild = await fetchToDiscord(`/guilds/${serverId}/preview`);
 
-  if (!dicordGuild) return [null, false];
+  if (!dicordGuild) return [null, null];
 
   const { id, name, icon } = dicordGuild;
 
   const result = await prisma.guild.create({
     data: {
-      id,
+      serverId: id,
       name,
       icon,
       members: {
@@ -88,14 +78,19 @@ export const registerMember = async (
         },
       },
     },
-    include: {
-      members: {
-        include: {
-          summoner: true,
-        },
+  });
+
+  const member = await prisma.member.findUnique({
+    where: {
+      guildId_summonerId: {
+        summonerId,
+        guildId: result.id,
       },
+    },
+    include: {
+      summoner: true,
     },
   });
 
-  return [result.members[0], true];
+  return [member, result];
 };
