@@ -1,31 +1,36 @@
 import { verifyKey } from 'discord-interactions';
 import { NextResponse } from 'next/server';
+import nextAuthMiddleware, { WithAuthArgs } from 'next-auth/middleware';
 import type { NextRequest } from 'next/server';
 
-async function buffer(readable: ReadableStream<Uint8Array> | null) {
+export const config = {
+  matcher: ['/api/interactions', '/guild/:path*'],
+};
+
+async function getRawbody(readable: ReadableStream<Uint8Array> | null) {
   if (!readable) return '';
   const result = await readable.getReader().read();
   return result.value || '';
 }
 
-export default async function middleware(request: NextRequest) {
-  const signature = request.headers.get('X-Signature-Ed25519') || '';
-  const timestamp = request.headers.get('X-Signature-Timestamp') || '';
+export default async function middleware(...args: WithAuthArgs) {
+  const request = args[0] as NextRequest;
 
-  const isValidRequest = verifyKey(
-    await buffer(request.body),
-    signature,
-    timestamp,
-    process.env.DISCORD_PUBLIC_KEY || ''
-  );
+  if (request.nextUrl.pathname === '/api/interactions') {
+    const signature = request.headers.get('X-Signature-Ed25519') || '';
+    const timestamp = request.headers.get('X-Signature-Timestamp') || '';
 
-  if (!isValidRequest) {
-    return NextResponse.json('Invalid Signature', { status: 401 });
+    const isValidRequest = verifyKey(
+      await getRawbody(request.body),
+      signature,
+      timestamp,
+      process.env.DISCORD_PUBLIC_KEY || ''
+    );
+
+    if (!isValidRequest) {
+      return NextResponse.json('Invalid Signature', { status: 401 });
+    }
   }
 
-  return NextResponse.next();
+  return nextAuthMiddleware(...args);
 }
-
-export const config = {
-  matcher: '/api/interactions',
-};

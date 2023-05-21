@@ -1,7 +1,5 @@
-import { SignInButton } from '@/components/layout';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
-import { Suspense } from 'react';
 import { authOptions } from './api/auth/[...nextauth]/route';
 
 const Home = async () => {
@@ -16,9 +14,6 @@ const Home = async () => {
         alt="Platforms on Vercel"
         className="w-40 h-40"
       />
-      <Suspense>
-        <SignInButton />
-      </Suspense>
     </div>
   );
 };

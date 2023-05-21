@@ -6,6 +6,8 @@ export async function POST(request: Request) {
 
   const { type, id, data } = body;
 
+  console.log(body);
+
   switch (type) {
     case InteractionType.PING:
       return NextResponse.json({ type: InteractionResponseType.PONG });
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
         case 'register':
           return NextResponse.json({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: { content: 'register' },
+            data: { content: 'register', components: [{}] },
           });
       }
   }
