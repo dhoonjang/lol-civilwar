@@ -3,8 +3,6 @@ import {
   registerMember,
   registerSummoner,
 } from '@/utils/register';
-import { positionOptions } from '@/utils/summoner';
-import { PositionType } from '@prisma/client';
 import { InteractionResponseType, InteractionType } from 'discord-interactions';
 import { NextResponse } from 'next/server';
 
@@ -60,11 +58,19 @@ export async function POST(request: Request) {
             });
           }
 
-          const result = await registerMember(body.guild_id, summoner.id);
+          const [member, createGuild] = await registerMember(
+            body.guild_id,
+            summoner.id
+          );
 
+          if (!member) return;
           return NextResponse.json({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: { content: JSON.stringify(result) },
+            data: {
+              content: `${member.summoner.name} 소환사가 내전${
+                createGuild ? '을 시작했습니다.' : '에 합류했습니다.'
+              }`,
+            },
           });
       }
     case InteractionType.MODAL_SUBMIT:
@@ -74,11 +80,29 @@ export async function POST(request: Request) {
         ({ custom_id }: { custom_id: string }) => custom_id === 'summoner_name'
       ).value;
 
-      const result = await registerSummoner(user.id, summonerName);
+      const summoner = await registerSummoner(user.id, summonerName);
 
+      if (!summoner)
+        return NextResponse.json({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: `${user.username}이 ${summonerName} 소환사 등록에 실패했습니다.`,
+          },
+        });
+
+      const [member, createGuild] = await registerMember(
+        body.guild_id,
+        summoner.id
+      );
+
+      if (!member) return;
       return NextResponse.json({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: `${result.name} 소환사 등록이 완료되었습니다.` },
+        data: {
+          content: `${member.summoner.name} 소환사가 내전${
+            createGuild ? '을 시작했습니다.' : '에 합류했습니다.'
+          }`,
+        },
       });
   }
 }

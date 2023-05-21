@@ -49,7 +49,7 @@ model Summoner {
 
   name            String
 
-  tier            Int
+  tier            Int?
   
   positions       Position[]
   riotAccounts    RiotAccount[]

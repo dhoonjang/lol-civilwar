@@ -1,5 +1,5 @@
-import { Permission } from '@prisma/client';
-import { fetchToDiscord } from './api';
+import { Member, Permission, Summoner } from '@prisma/client';
+import { fetchToDiscord, fetchToRiot } from './api';
 import prisma from './prisma';
 
 export const getSummonerByDiscordId = async (discordId: string) => {
@@ -13,18 +13,42 @@ export const getSummonerByDiscordId = async (discordId: string) => {
 };
 
 export const registerSummoner = async (discordId: string, name: string) => {
+  const riotData = await fetchToRiot(
+    `/lol/summoner/v4/summoners/by-name/${name}`
+  );
+
+  if (!riotData.puuid) return;
+
   const summoner = await prisma.summoner.create({
     data: {
-      discordId: '1234',
-      name: 'Hide on bush',
+      discordId,
+      name,
       tier: 0,
+      riotAccounts: {
+        create: {
+          puuid: riotData.puuid,
+        },
+      },
     },
   });
 
   return summoner;
 };
 
-export const registerMember = async (guildId: string, summonerId: string) => {
+export const registerMember = async (
+  guildId: string,
+  summonerId: string
+): Promise<
+  [
+    (
+      | (Member & {
+          summoner: Summoner;
+        })
+      | null
+    ),
+    boolean
+  ]
+> => {
   const existGuild = await prisma.guild.findUnique({
     where: {
       id: guildId,
@@ -38,20 +62,25 @@ export const registerMember = async (guildId: string, summonerId: string) => {
         permission: Permission.MEMBER,
         guildId: existGuild.id,
       },
+      include: {
+        summoner: true,
+      },
     });
 
-    return member;
+    return [member, false];
   }
 
-  const guild = await fetchToDiscord(`/guilds/${guildId}/preview`);
+  const dicordGuild = await fetchToDiscord(`/guilds/${guildId}/preview`);
 
-  if (!guild) return null;
+  if (!dicordGuild) return [null, false];
 
-  return await prisma.guild.create({
+  const { id, name, icon } = dicordGuild;
+
+  const result = await prisma.guild.create({
     data: {
-      id: guild.id,
-      name: guild.name,
-      icon: guild.icon,
+      id,
+      name,
+      icon,
       members: {
         create: {
           summonerId,
@@ -60,7 +89,13 @@ export const registerMember = async (guildId: string, summonerId: string) => {
       },
     },
     include: {
-      members: true,
+      members: {
+        include: {
+          summoner: true,
+        },
+      },
     },
   });
+
+  return [result.members[0], true];
 };
