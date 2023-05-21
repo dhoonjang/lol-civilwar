@@ -7,8 +7,6 @@ import { authOptions } from './api/auth/[...nextauth]/route';
 const Home = async () => {
   const session = await getServerSession(authOptions);
 
-  console.log(session?.user);
-
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Image

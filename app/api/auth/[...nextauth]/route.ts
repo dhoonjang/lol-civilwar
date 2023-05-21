@@ -5,7 +5,7 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     DiscordProvider({
-      clientId: '1098189483125506139',
+      clientId: process.env.DISCORD_APP_ID || '',
       clientSecret: process.env.DISCORD_CLIENT_SECRET || '',
     }),
   ],
@@ -13,13 +13,7 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    jwt: async ({ token, account }) => {
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-      return token;
-    },
-    session: async ({ session, token }) => {
+    session: ({ session, token }) => {
       if (session.user) session.user.id = token.sub;
       return session;
     },
