@@ -1,7 +1,7 @@
 import { verifyKey } from 'discord-interactions';
 import { NextResponse } from 'next/server';
 import nextAuthMiddleware, { WithAuthArgs } from 'next-auth/middleware';
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 
 export const config = {
   matcher: ['/api/interactions', '/guild/:path*'],
@@ -30,6 +30,8 @@ export default async function middleware(...args: WithAuthArgs) {
     if (!isValidRequest) {
       return NextResponse.json('Invalid Signature', { status: 401 });
     }
+
+    return NextResponse.next();
   }
 
   return nextAuthMiddleware(...args);

@@ -1,3 +1,4 @@
+import { fetchToDiscord } from '@/utils/index';
 import { InteractionResponseType, InteractionType } from 'discord-interactions';
 import { NextResponse } from 'next/server';
 
@@ -22,9 +23,13 @@ export async function POST(request: Request) {
             data: { content: 'hello world' },
           });
         case 'register':
+          const guild = await fetchToDiscord(
+            `/guilds/${body.guild_id}/preview`
+          );
+          console.log(guild);
           return NextResponse.json({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: { content: 'register', components: [{}] },
+            data: { content: JSON.stringify(guild) },
           });
       }
   }

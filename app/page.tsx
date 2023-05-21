@@ -1,10 +1,6 @@
-import { getServerSession } from 'next-auth';
 import Image from 'next/image';
-import { authOptions } from './api/auth/[...nextauth]/route';
 
 const Home = async () => {
-  const session = await getServerSession(authOptions);
-
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Image
