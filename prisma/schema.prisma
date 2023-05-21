@@ -14,6 +14,7 @@ datasource db {
 model Guild {
   id          String @id
   name        String
+  icon        String?
 
   members     Member[]
 
@@ -23,14 +24,12 @@ model Guild {
 
 enum Permission {
   OWNER
-  ADMIN
   MEMBER
 }
 
 model Member {
-  id            String @id
+  id            String @id @default(cuid())
 
-  image         String
   permission    Permission
   guildId       String
   summonerId    String
@@ -59,6 +58,8 @@ model Summoner {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([discordId])
 }
 
 model RiotAccount {

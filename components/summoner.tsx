@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { getTierInfo, positionOptions } from 'utils';
+import { getTierInfo, positionOptions } from '@/utils/lol';
 import Image from 'next/image';
 import { Summoner } from '@prisma/client';
 
