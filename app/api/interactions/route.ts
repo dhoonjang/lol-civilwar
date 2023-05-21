@@ -26,7 +26,6 @@ export async function POST(request: Request) {
           const guild = await fetchToDiscord(
             `/guilds/${body.guild_id}/preview`
           );
-          console.log(guild);
           return NextResponse.json({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: { content: JSON.stringify(guild) },

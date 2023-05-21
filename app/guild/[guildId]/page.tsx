@@ -10,9 +10,7 @@ const GuildPage = async () => {
         alt="Platforms on Vercel"
         className="w-40 h-40"
       />
-      <h1 className="font-bold text-xl text-center mb-10">
-        팀 결성 시스템 준비중
-      </h1>
+      <h1 className="font-bold text-xl text-center mb-10">길드</h1>
     </div>
   );
 };
