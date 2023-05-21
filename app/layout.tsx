@@ -9,7 +9,7 @@ const roman = localFont({
 });
 
 export const metadata = {
-  title: '찌질이들의 롤대회',
+  title: 'LOL Civilwar',
 };
 
 export default async function RootLayout({
