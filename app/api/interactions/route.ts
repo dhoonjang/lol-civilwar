@@ -20,9 +20,7 @@ const registerResponse = (summoner: Summoner, guild: Guild | null) =>
           components: [
             {
               type: 2,
-              label: !guild
-                ? `[${summoner.name}] 소환사 바로가기`
-                : `길드 바로가기`,
+              label: !guild ? `[${summoner.name}] 소환사` : `길드 바로가기`,
               style: 5,
               url: `https://lol-civilwar.vercel.app/${
                 !guild ? `summoners/${summoner.id}` : `guilds/${guild.id}`
