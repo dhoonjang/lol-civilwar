@@ -1,10 +1,23 @@
 import { Permission } from '@prisma/client';
 import { fetchToDiscord } from './api';
+import prisma from './prisma';
 
 export const getSummonerByDiscordId = async (discordId: string) => {
   const summoner = await prisma.summoner.findUnique({
     where: {
       discordId,
+    },
+  });
+
+  return summoner;
+};
+
+export const registerSummoner = async (discordId: string, name: string) => {
+  const summoner = await prisma.summoner.create({
+    data: {
+      discordId: '1234',
+      name: 'Hide on bush',
+      tier: 0,
     },
   });
 

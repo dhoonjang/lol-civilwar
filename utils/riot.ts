@@ -1,4 +1,4 @@
-import { fetchToRiot } from '../utils/lol';
+import { fetchToRiot } from './api';
 
 export interface RiotMatch {
   matchId: string;

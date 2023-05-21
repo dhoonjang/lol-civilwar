@@ -13,31 +13,32 @@ import jungleImage from '@/assets/jungle.svg';
 import midImage from '@/assets/mid.svg';
 import adcImage from '@/assets/adc.svg';
 import supportImage from '@/assets/support.svg';
+import { PositionType } from '@prisma/client';
 
 export const positionOptions = [
   {
     label: '탑 라이너',
-    value: 'TOP',
+    value: PositionType.TOP,
     image: topImage,
   },
   {
     label: '정글러',
-    value: 'JUNGLE',
+    value: PositionType.JUNGLE,
     image: jungleImage,
   },
   {
     label: '미드 라이너',
-    value: 'MID',
+    value: PositionType.MID,
     image: midImage,
   },
   {
-    label: '원거리 딜러',
-    value: 'ADC',
+    label: '봇 라이너',
+    value: PositionType.BOTTOM,
     image: adcImage,
   },
   {
     label: '서포터',
-    value: 'SUPPORT',
+    value: PositionType.SUPPORT,
     image: supportImage,
   },
 ];

@@ -50,8 +50,8 @@ model Summoner {
   name            String
 
   tier            Int
-  position        String
-
+  
+  positions       Position[]
   riotAccounts    RiotAccount[]
   members         Member[]
   participants    Participant[]
@@ -60,6 +60,24 @@ model Summoner {
   updatedAt       DateTime @updatedAt
 
   @@index([discordId])
+}
+
+enum PositionType {
+  TOP
+  JUNGLE
+  MID
+  BOTTOM
+  SUPPORT
+}
+
+model Position {
+  summonerId  String
+  weight      Int
+  position    PositionType
+
+  sumnoner    Summoner @relation(fields: [summonerId], references: [id], onDelete: Cascade)
+
+  @@unique([summonerId, position])
 }
 
 model RiotAccount {
