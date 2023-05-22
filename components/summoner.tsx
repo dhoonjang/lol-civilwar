@@ -3,15 +3,21 @@
 import { FC } from 'react';
 import { getTierInfo, positionOptions } from '@/utils/summoner';
 import Image from 'next/image';
-import { Position, Summoner } from '@prisma/client';
+import { Position, Summoner, SummonerStat } from '@prisma/client';
 
 export const UserCard: FC<{
   className?: string;
   summoner: Summoner & {
+    summonerStats: SummonerStat[];
     positions: Position[];
   };
-}> = ({ className, summoner: { tier, positions, name } }) => {
-  const tierInfo = getTierInfo(tier || 0);
+}> = ({ className, summoner: { summonerStats, positions, name } }) => {
+  const tierInfo = getTierInfo(
+    summonerStats.reduce<number>(
+      (stat, curr, index) => (curr.value + stat * index) / index + 1,
+      0
+    )
+  );
 
   return (
     <div className={`card flex gap-6 items-center justify-center ${className}`}>
