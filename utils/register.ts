@@ -23,7 +23,6 @@ export const registerSummoner = async (discordId: string, name: string) => {
     data: {
       discordId,
       name,
-      tier: 0,
       riotAccounts: {
         create: {
           puuid: riotData.puuid,

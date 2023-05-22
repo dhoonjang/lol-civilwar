@@ -40,8 +40,8 @@ model Member {
   guild         Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
   summoner      Summoner @relation(fields: [summonerId], references: [id], onDelete: Cascade)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([guildId, summonerId])
   @@index([guildId])
@@ -55,8 +55,7 @@ model Summoner {
 
   name            String
 
-  tier            Int?
-  
+  summonerStats   SummonerStat[]
   positions       Position[]
   riotAccounts    RiotAccount[]
   members         Member[]
@@ -66,6 +65,16 @@ model Summoner {
   updatedAt       DateTime @updatedAt
 
   @@index([discordId])
+}
+
+model SummonerStat {
+  summonerId  String
+  statName    String
+  value       Int
+
+  sumnoner    Summoner @relation(fields: [summonerId], references: [id], onDelete: Cascade)
+
+  @@unique([summonerId, statName])
 }
 
 enum PositionType {
