@@ -104,6 +104,11 @@ model RiotAccount {
   @@index([summonerId])
 }
 
+enum MatchType {
+  EXTERNAL
+  INTERNAL
+}
+
 enum MatchStatus {
   BATTING
   STARTED
@@ -112,11 +117,14 @@ enum MatchStatus {
 
 model Match {
   id              String @id @default(cuid())
+  
+  type            MatchType
   status          MatchStatus
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  timestamp       DateTime?
+  timestamp       DateTime
   duration        Int?
 
   participants    Participant[]
@@ -126,7 +134,9 @@ model Match {
 
 model Participant {
   id              String @id @default(cuid())
-  summonerId           String
+
+  puuid           String?
+  summonerId      String?
   matchId         String
 
   win             Boolean?
