@@ -19,7 +19,18 @@ export const registerSummoner = async (discordId: string, name: string) => {
     `/lol/summoner/v4/summoners/by-name/${name}`
   );
 
-  if (!riotData.puuid) return;
+  if (!riotData.puuid || !riotData.id) return;
+
+  const { id, puuid } = riotData;
+
+  const [leagueList, participants] = await Promise.all([
+    fetchToRiot(`/lol/league/v4/entries/by-summoner/${id}`),
+    prisma.participant.findMany({
+      where: {
+        puuid: riotData.puuid,
+      },
+    }),
+  ]);
 
   const summoner = await prisma.summoner.create({
     data: {
@@ -27,7 +38,8 @@ export const registerSummoner = async (discordId: string, name: string) => {
       name,
       riotAccounts: {
         create: {
-          puuid: riotData.puuid,
+          id,
+          puuid,
         },
       },
     },

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-const GuildPage = async () => {
+const MatchPage = async () => {
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Image
@@ -15,4 +15,4 @@ const GuildPage = async () => {
   );
 };
 
-export default GuildPage;
+export default MatchPage;

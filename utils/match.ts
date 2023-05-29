@@ -1,26 +1,14 @@
-import { RiotAccount } from '@prisma/client';
-import { fetchToRiot } from './api';
+import { Match, RiotAccount } from '@prisma/client';
+import { RiotMatchResponse, fetchToRiot } from './api';
 import prisma from './prisma';
 import { getSummonerByDiscordId } from './register';
 import { NextResponse } from 'next/server';
 import { InteractionResponseType } from 'discord-interactions';
-import { format } from 'date-fns';
+import { MatchParticipant, getMatchParticipant } from './participant';
 
-export interface RiotMatch {
-  matchId: string;
-  timestamp: number;
-  duration: number;
+export interface MatchRequest
+  extends Pick<Match, 'id' | 'type' | 'status' | 'timestamp' | 'duration'> {
   participants: MatchParticipant[];
-}
-
-export interface MatchParticipant {
-  win: boolean;
-  championName: string;
-  puuid: string;
-  summonerName: string;
-  kills: number;
-  assists: number;
-  deaths: number;
 }
 
 export const getGuildRiotAccounts = async (
@@ -67,36 +55,13 @@ export const getRiotMatchIdList = async (
   }
 };
 
-export const getRiotMatch = async (
-  matchId: string
-): Promise<RiotMatch | null> => {
-  const result = await fetchToRiot(`/lol/match/v5/matches/${matchId}`, 'asia');
-  if (!result.metadata) return null;
-  const { metadata, info } = result;
-  return {
-    matchId: metadata.matchId,
-    timestamp: info.gameStartTimestamp,
-    duration: info.gameDuration,
-    participants: info.participants.map(
-      ({
-        win,
-        championName,
-        puuid,
-        summonerName,
-        kills,
-        assists,
-        deaths,
-      }: MatchParticipant) => ({
-        win,
-        championName,
-        puuid,
-        summonerName,
-        kills,
-        assists,
-        deaths,
-      })
-    ),
-  };
+export const getRiotMatch = async (matchId: string) => {
+  const result = await fetchToRiot<RiotMatchResponse>(
+    `/lol/match/v5/matches/${matchId}`,
+    'asia'
+  );
+  if (!result?.metadata) return null;
+  return result;
 };
 
 export const getRiotMatchList = async (riotAccounts: RiotAccount[]) => {
@@ -106,7 +71,7 @@ export const getRiotMatchList = async (riotAccounts: RiotAccount[]) => {
     select: { id: true },
   });
 
-  const matchIdResponse = (
+  const newMatchIdList = (
     await Promise.allSettled(
       puuidList.map((puuid) => getRiotMatchIdList(puuid))
     )
@@ -114,22 +79,8 @@ export const getRiotMatchList = async (riotAccounts: RiotAccount[]) => {
     .filter(
       (r): r is PromiseFulfilledResult<string[]> => r.status === 'fulfilled'
     )
-    .flatMap((r) => r.value);
-
-  const matchIdCount: { matchId: string; count: number }[] = [];
-
-  matchIdResponse.forEach((matchId) => {
-    const cnt = matchIdCount.find((m) => m.matchId === matchId);
-    if (cnt) cnt.count++;
-    else matchIdCount.push({ matchId, count: 1 });
-  });
-
-  const newMatchIdList = matchIdCount
-    .filter(
-      ({ matchId, count }) =>
-        !currentMatchIdList.some(({ id }) => id === matchId) && count >= 1
-    )
-    .map((m) => m.matchId);
+    .flatMap((r) => r.value)
+    .filter((matchId) => !currentMatchIdList.some(({ id }) => id === matchId));
 
   return (
     await Promise.allSettled(
@@ -137,7 +88,7 @@ export const getRiotMatchList = async (riotAccounts: RiotAccount[]) => {
     )
   )
     .filter(
-      (r): r is PromiseFulfilledResult<RiotMatch> =>
+      (r): r is PromiseFulfilledResult<RiotMatchResponse> =>
         r.status === 'fulfilled' && r.value !== null
     )
     .map((r) => r.value);
@@ -155,10 +106,10 @@ export const participantWithSummoner = (
   };
 };
 
-export const riotMatchWithSummoner = (
-  match: RiotMatch,
+export const matchRequestWithSummoner = (
+  match: MatchRequest,
   riotAccounts: RiotAccount[]
-) => {
+): MatchRequest => {
   const participants = match.participants.map((participant) =>
     participantWithSummoner(participant, riotAccounts)
   );
@@ -169,40 +120,41 @@ export const riotMatchWithSummoner = (
   };
 };
 
+export const getMatchRequest = (match: RiotMatchResponse): MatchRequest => {
+  const participants = match.info.participants.map(getMatchParticipant);
+
+  return {
+    id: match.metadata.matchId,
+    type: 'EXTERNAL',
+    status: 'END',
+    timestamp: new Date(match.info.gameStartTimestamp),
+    duration: match.info.gameDuration,
+    participants,
+  };
+};
+
 export const createManyMatch = async (
-  matchList: RiotMatch[],
+  matchList: MatchRequest[],
   riotAccounts: RiotAccount[]
 ) => {
   if (matchList.length === 0) return [];
 
   const matchListWithSummoner = matchList.map((match) =>
-    riotMatchWithSummoner(match, riotAccounts)
+    matchRequestWithSummoner(match, riotAccounts)
   );
 
-  const promiseList = matchListWithSummoner.map((match) =>
-    prisma.match.create({
-      data: {
-        id: match.matchId,
-        type: 'EXTERNAL',
-        status: 'END',
-        timestamp: new Date(match.timestamp),
-        duration: match.duration,
-        participants: {
-          createMany: {
-            data: match.participants.map((participant) => ({
-              win: participant.win,
-              puuid: participant.puuid,
-              summonerId: participant.summonerId,
-              championName: participant.championName,
-              summonerName: participant.summonerName,
-              kills: participant.kills,
-              assists: participant.assists,
-              deaths: participant.deaths,
-            })),
+  const promiseList = matchListWithSummoner.map(
+    ({ participants, ...matchData }) =>
+      prisma.match.create({
+        data: {
+          ...matchData,
+          participants: {
+            createMany: {
+              data: participants,
+            },
           },
         },
-      },
-    })
+      })
   );
 
   const result = await prisma.$transaction(promiseList);
@@ -226,7 +178,10 @@ export const handleLoadMatch = async (guildId: string, userId: string) => {
     const riotAccounts = await getGuildRiotAccounts(guildId);
     const riotMatchList = await getRiotMatchList(riotAccounts);
 
-    const matchList = await createManyMatch(riotMatchList, riotAccounts);
+    const matchList = await createManyMatch(
+      riotMatchList.map(getMatchRequest),
+      riotAccounts
+    );
 
     return NextResponse.json({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
