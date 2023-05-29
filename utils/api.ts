@@ -20,13 +20,13 @@ export interface RiotMatchParticipantResponse {
   timeCCingOthers: number;
   timePlayed: number;
   damageSelfMitigated: number;
-  killParticipation: number;
   goldEarned: number;
   goldSpent: number;
   teamDamagePercentage: number;
   visionScore: number;
   challenges: {
     abilityUses: number;
+    killParticipation: number;
     damageTakenOnTeamPercentage: number;
     teamDamagePercentage: number;
     saveAllyFromDeath: number;

@@ -27,7 +27,7 @@ export interface MatchParticipant
 
   totalDamage: number;
   magicDamage: number;
-  pyshicalDamage: number;
+  physicalDamage: number;
 }
 
 export interface CommonInfo {
@@ -59,16 +59,26 @@ export const getTankerScore = (tankerInfo: TankerInfo) => {
   const damageTakenPerMinute =
     ((totalDamageTaken + damageSelfMitigated) / timePlayed) * 60;
 
-  const damageTakenPerDeath = (totalDamageTaken + damageSelfMitigated) / deaths;
+  const damageTakenPerDeath =
+    (totalDamageTaken + damageSelfMitigated) / (deaths || 0.5);
 
   const aliveRate = (timePlayed - totalTimeSpentDead) / timePlayed;
 
-  return (
+  console.log(
+    'tankerScore: ',
+    damageTakenPerMinute,
+    damageTakenPerDeath,
+    damageTakenOnTeamPercentage,
+    killParticipation,
+    win
+  );
+
+  return Math.round(
     (damageTakenPerMinute + damageTakenPerDeath) *
-    Math.pow(aliveRate, 0.2) *
-    Math.pow(damageTakenOnTeamPercentage, 0.4) *
-    Math.pow(killParticipation, 0.4) *
-    (win ? 1.1 : 1)
+      Math.pow(aliveRate, 0.2) *
+      Math.pow(damageTakenOnTeamPercentage, 0.4) *
+      Math.pow(killParticipation || 0.01, 0.4) *
+      (win ? 1100 : 1000)
   );
 };
 
@@ -96,17 +106,17 @@ export const getDealerScore = (dealerInfo: DealerInfo) => {
 
   const aliveRate = (timePlayed - totalTimeSpentDead) / timePlayed;
 
-  return (
+  return Math.round(
     (damagePer10Gold + damagePerMinute) *
-    Math.pow(kda, 0.2) *
-    Math.pow(teamDamagePercentage, 0.4) *
-    Math.pow(aliveRate, 0.4) *
-    (win ? 1.1 : 1)
+      Math.pow(kda || 0.01, 0.2) *
+      Math.pow(teamDamagePercentage, 0.4) *
+      Math.pow(aliveRate, 0.4) *
+      (win ? 1100 : 1000)
   );
 };
 
 export interface UtilityInfo extends CommonInfo {
-  visionScorePerMinute: number;
+  visionScore: number;
   effectiveHealAndShielding: number;
   killParticipation: number;
   visionScoreAdvantageLaneOpponent: number;
@@ -114,7 +124,7 @@ export interface UtilityInfo extends CommonInfo {
 
 export const getUtilityScore = (utilityInfo: UtilityInfo) => {
   const {
-    visionScorePerMinute,
+    visionScore,
     visionScoreAdvantageLaneOpponent,
     effectiveHealAndShielding,
     killParticipation,
@@ -122,15 +132,26 @@ export const getUtilityScore = (utilityInfo: UtilityInfo) => {
     timePlayed,
   } = utilityInfo;
 
-  const visionPoint =
-    (visionScorePerMinute + visionScoreAdvantageLaneOpponent) * 100;
+  const visionPoint = Math.pow(
+    ((visionScore + visionScoreAdvantageLaneOpponent) / timePlayed) * 60,
+    2
+  );
+
   const effectiveHealAndShieldingPerMinute =
     (effectiveHealAndShielding / timePlayed) * 60;
 
-  return (
+  console.log(
+    'utilityScore: ',
+    visionPoint,
+    effectiveHealAndShieldingPerMinute,
+    killParticipation,
+    win
+  );
+
+  return Math.round(
     (visionPoint + effectiveHealAndShieldingPerMinute) *
-    Math.pow(killParticipation, 0.2) *
-    (win ? 1.1 : 1)
+      Math.pow(killParticipation || 0.01, 0.2) *
+      (win ? 1100 : 1000)
   );
 };
 
@@ -154,28 +175,30 @@ export const getMatchParticipant = (
     totalDamageTaken,
     damageSelfMitigated,
     totalTimeSpentDead,
-    killParticipation,
     goldSpent,
+    visionScore,
     challenges: {
       damageTakenOnTeamPercentage,
+      killParticipation,
       kda,
       teamDamagePercentage,
-      visionScorePerMinute,
       visionScoreAdvantageLaneOpponent,
       effectiveHealAndShielding,
     },
   } = participantResponse;
 
   return {
+    puuid,
+
     win,
     championId,
     championName,
-    puuid,
     summonerName,
     kills,
     assists,
     deaths,
     position: teamPosition,
+
     jsonString: JSON.stringify(participantResponse),
 
     tankerScore: getTankerScore({
@@ -200,7 +223,7 @@ export const getMatchParticipant = (
     utilityScore: getUtilityScore({
       win,
       timePlayed,
-      visionScorePerMinute,
+      visionScore,
       visionScoreAdvantageLaneOpponent,
       killParticipation,
       effectiveHealAndShielding,
@@ -209,8 +232,8 @@ export const getMatchParticipant = (
     snowballScore: 0,
     crackScore: 0,
 
-    totalDamage: totalDamageDealtToChampions,
-    magicDamage: magicDamageDealtToChampions,
-    pyshicalDamage: physicalDamageDealtToChampions,
+    totalDamage: Math.round(totalDamageDealtToChampions),
+    magicDamage: Math.round(magicDamageDealtToChampions),
+    physicalDamage: Math.round(physicalDamageDealtToChampions),
   };
 };

@@ -28,7 +28,7 @@ export const positionOptions = [
   },
   {
     label: '미드 라이너',
-    value: PositionType.MID,
+    value: PositionType.MIDDLE,
     image: midImage,
   },
   {
@@ -38,7 +38,7 @@ export const positionOptions = [
   },
   {
     label: '서포터',
-    value: PositionType.SUPPORT,
+    value: PositionType.UTILITY,
     image: supportImage,
   },
 ];

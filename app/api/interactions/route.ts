@@ -19,7 +19,6 @@ export async function POST(request: Request) {
 
     case InteractionType.APPLICATION_COMMAND:
       const { name } = data;
-      const { user } = body.member;
 
       switch (name) {
         case 'test':
@@ -28,9 +27,9 @@ export async function POST(request: Request) {
             data: { content: 'hello world' },
           });
         case 'register':
-          return await handleRegisterMember(body.guild_id, user.id);
+          return await handleRegisterMember(body.guild_id, body.member.user.id);
         case 'match':
-          return await handleLoadMatch(body.guild_id, user.id);
+          return await handleLoadMatch(body.guild_id, body.member.user.id);
       }
     case InteractionType.MODAL_SUBMIT:
       if (data.custom_id !== 'summoner_register_modal') return;
@@ -38,13 +37,16 @@ export async function POST(request: Request) {
         ({ custom_id }: { custom_id: string }) => custom_id === 'summoner_name'
       ).value;
 
-      const summoner = await registerSummoner(user.id, summonerName);
+      const summoner = await registerSummoner(
+        body.member.user.id,
+        summonerName
+      );
 
       if (!summoner) {
         return NextResponse.json({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: `${user.username}이 [${summonerName}] 소환사 등록에 실패했습니다.`,
+            content: `${body.member.user.username}이 [${summonerName}] 소환사 등록에 실패했습니다.`,
           },
         });
       }

@@ -106,21 +106,11 @@ export const participantWithSummoner = (
   };
 };
 
-export const matchRequestWithSummoner = (
-  match: MatchRequest,
-  riotAccounts: RiotAccount[]
-): MatchRequest => {
-  const participants = match.participants.map((participant) =>
-    participantWithSummoner(participant, riotAccounts)
-  );
+export const getMatchRequest = (
+  match: RiotMatchResponse
+): MatchRequest | null => {
+  if (match.info.gameDuration < 300) return null;
 
-  return {
-    ...match,
-    participants,
-  };
-};
-
-export const getMatchRequest = (match: RiotMatchResponse): MatchRequest => {
   const participants = match.info.participants.map(getMatchParticipant);
 
   return {
@@ -139,27 +129,31 @@ export const createManyMatch = async (
 ) => {
   if (matchList.length === 0) return [];
 
-  const matchListWithSummoner = matchList.map((match) =>
-    matchRequestWithSummoner(match, riotAccounts)
-  );
+  const promiseList = matchList.map(({ participants, ...matchData }) => {
+    const pariticpantsData = participants.map((p) =>
+      participantWithSummoner(p, riotAccounts)
+    );
 
-  const promiseList = matchListWithSummoner.map(
-    ({ participants, ...matchData }) =>
-      prisma.match.create({
-        data: {
-          ...matchData,
-          participants: {
-            createMany: {
-              data: participants,
-            },
-          },
+    return prisma.match.create({
+      data: {
+        ...matchData,
+
+        participants: {
+          createMany: { data: pariticpantsData },
         },
-      })
-  );
+      },
+    });
+  });
 
-  const result = await prisma.$transaction(promiseList);
+  try {
+    const result = await prisma.$transaction(promiseList);
 
-  return result;
+    return result;
+  } catch (error) {
+    console.log(error);
+
+    return [];
+  }
 };
 
 export const handleLoadMatch = async (guildId: string, userId: string) => {
@@ -179,7 +173,9 @@ export const handleLoadMatch = async (guildId: string, userId: string) => {
     const riotMatchList = await getRiotMatchList(riotAccounts);
 
     const matchList = await createManyMatch(
-      riotMatchList.map(getMatchRequest),
+      riotMatchList
+        .map(getMatchRequest)
+        .filter((r): r is MatchRequest => r !== null),
       riotAccounts
     );
 
